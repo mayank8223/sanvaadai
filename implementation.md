@@ -12,7 +12,7 @@ This document breaks the work into independent tasks with:
 
 **Backend and data (T1–T9):** This project uses **Supabase** as the chosen backend:
 
-- **Database** – Supabase Postgres; access via Supabase client (`@supabase/supabase-js`, `@supabase/ssr`). Schema and migrations are managed in Supabase (Dashboard SQL Editor or Supabase CLI), not Prisma.
+- **Database** – Supabase Postgres; access via Supabase client (`@supabase/supabase-js`, `@supabase/ssr`). **Schema and migrations are managed with Drizzle ORM** in `apps/web` (`db/schema.ts`, `drizzle/`); no Prisma.
 - **Auth** – Supabase Auth for email/password (and optional social logins) on web and mobile.
 - **Storage** – Supabase Storage for media files when needed; optional and can be added later.
 
@@ -159,7 +159,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T8
 - **Description:**
-  - **What:** Define tables in the **Supabase** project for `User` (or link to `auth.users`), `Organization`, and `Membership` (with roles e.g. ADMIN, COLLECTOR). Use Supabase Dashboard SQL Editor or Supabase CLI migrations. Sync application `User` records with Supabase Auth users (e.g. trigger or app logic that creates/updates local User rows from `auth.users`).
+  - **What:** Define tables in the **Supabase** project for `User` (or link to `auth.users`), `Organization`, and `Membership` (with roles e.g. ADMIN, COLLECTOR). **Use Drizzle ORM** in `apps/web` (`db/schema.ts`) as source of truth; run migrations with `bun run db:migrate` (see `docs/T9-schema-checklist.md`). Sync application `User` records with Supabase Auth users via a DB trigger (custom migration).
   - **Why:** These entities are required for multi-tenancy and role-based access control; they live in Supabase Postgres and are accessed via the Supabase client.
   - **Unlocks:** Enforces organizational boundaries and lets you scope all data by org and user role.
 
@@ -527,7 +527,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ## Summary
 
-- **Backend & data (T1–T9 and beyond):** **Supabase** is the chosen backend: Postgres (accessed via Supabase client; schema/migrations in Supabase Dashboard or CLI), Auth (web + mobile), and optional Storage. There is no Prisma; all data access uses the Supabase client.
+- **Backend & data (T1–T9 and beyond):** **Supabase** is the chosen backend: Postgres (accessed via Supabase client; **schema/migrations via Drizzle ORM** in `apps/web`), Auth (web + mobile), and optional Storage. There is no Prisma; all data access uses the Supabase client.
 - **P0 tasks** give you a fully functional, secure data-collection platform with manual form creation, mobile submission (offline + GPS), and admin dashboards.
 - **P1 tasks** layer in AI (voice dictation for form creation and form filling), CSV export, and observability.
 - **P2 tasks** refine the developer experience and UX (design tokens, extended AI flows, deep documentation).
