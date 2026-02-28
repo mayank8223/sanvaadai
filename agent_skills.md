@@ -262,6 +262,7 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
 
 - **Improvement Notes:**  
   - (2026-02-28) Future sessions should attach estimates and owner roles for each task if needed for team planning.
+  - (2026-02-28) **T2 completed:** Monorepo created with Turborepo. Structure: `apps/web` (Next.js, moved from root), `apps/mobile` (Expo blank TypeScript), `packages/tsconfig` (base + nextjs shared configs), `packages/types` (shared types; placeholder until T13). Root has workspaces, turbo.json, and high-level scripts. Expo app was created manually (create-expo-app failed in sandbox); use Expo SDK 52 and React 19 for alignment with web. After creating workspaces, run `bun install` (or npm/pnpm) from root; if install fails (e.g. tarball errors), suggest user retry or use npm.
   - (2026-02-28) **T1 completed:** T1 is non-code; output is `docs/T1-infrastructure-checklist.md` (provisioning checklist with env var names) and `.env.example` (contract for later tasks). Agent should not write code for “provisioning” – only docs and env placeholders. Actual account/project creation is done by the user in cloud consoles. Later tasks (T4, T8, T10, T27, T28) consume these env vars.
 
 - **Last Updated:** 2026-02-28

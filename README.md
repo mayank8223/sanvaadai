@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sanvaadai
 
-## Getting Started
+Monorepo for the AI-enabled data collection platform.
 
-First, run the development server:
+## Structure
+
+- **`apps/web`** – Next.js admin & API (App Router, TypeScript)
+- **`apps/mobile`** – Expo (React Native) collector app
+- **`packages/tsconfig`** – Shared TypeScript configs (base, Next.js)
+- **`packages/types`** – Shared TypeScript types (forms, submissions; expanded in T13)
+- **`docs/`** – Implementation checklists and notes
+
+## Prerequisites
+
+- Node.js ≥ 20
+- [Bun](https://bun.sh) (package manager; root `package.json` uses `packageManager: "bun@1.0.0"`)
+
+## Commands (from repo root)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Install dependencies (all workspaces)
+bun install
+
+# Build all apps and packages
+bun run build
+
+# Run dev servers (web and/or mobile)
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running individual apps
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Web (Next.js)**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd apps/web && bun run dev
+```
 
-## Learn More
+Then open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+**Mobile (Expo)**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd apps/mobile && bun run start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Use Expo Go on a device or an emulator to run the app.
 
-## Deploy on Vercel
+## Implementation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [implementation.md](./implementation.md) for the full task list and [docs/T1-infrastructure-checklist.md](./docs/T1-infrastructure-checklist.md) for infrastructure setup.
