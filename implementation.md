@@ -12,17 +12,18 @@ This document breaks the work into independent tasks with:
 
 Before or alongside implementation, you’ll need to set up the following external resources:
 
+**Backend & data (Supabase):** This project uses **Supabase** for:
+
+- **Managed PostgreSQL database** – tables, migrations, and queries (via Prisma connecting to Supabase Postgres).
+- **Auth** – Supabase Auth for email/password (and optional social logins) on web and mobile.
+- **Object storage (optional)** – Supabase Storage for media files, or you may use S3/R2 if preferred.
+
+One Supabase project provides the database connection string, Auth URL/keys, and optionally storage; see `docs/T1-infrastructure-checklist.md` and `.env.example`.
+
+**Other external resources:**
+
 - **Cloud hosting for web + API**
   - e.g. Vercel project connected to your Git repo.
-
-- **Managed PostgreSQL database**
-  - e.g. Supabase, Neon, Railway, or AWS RDS.
-
-- **Object storage for media files**
-  - e.g. AWS S3 / Cloudflare R2 / Supabase Storage.
-
-- **Auth provider**
-  - e.g. Supabase Auth, Clerk, or Auth0 (email/password + social optional).
 
 - **LLM provider & API keys**
   - e.g. OpenAI / Anthropic, to be used via Vercel AI SDK.
@@ -50,9 +51,9 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** None
 - **Description:**
-  - **What:** Decide on and create the core projects: Vercel project (or alternative), managed Postgres instance, object storage bucket, auth provider tenant, LLM + STT provider keys.
-  - **Why:** All subsequent work (DB schemas, auth integration, AI endpoints) depends on having concrete endpoints and credentials.
-  - **Unlocks:** Ability to connect the app to real DB/storage/auth/AI services instead of mocks.
+  - **What:** Create a **Supabase project** (for Postgres, Auth, and optionally Storage), a Vercel project (or alternative) for web/API, and obtain LLM + STT provider keys. Use `docs/T1-infrastructure-checklist.md` and `.env.example` as the contract.
+  - **Why:** All subsequent work (DB schemas, auth integration, AI endpoints) depends on having Supabase credentials and API keys.
+  - **Unlocks:** Ability to connect the app to Supabase (tables, auth) and AI services instead of mocks.
 
 ---
 
@@ -128,15 +129,15 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ---
 
-### T8 – Setup Prisma and connect to Postgres
+### T8 – Setup Prisma and connect to Supabase Postgres
 
 - **Complexity:** Medium
 - **Priority:** P0
 - **Dependencies:** T1, T4
 - **Description:**
-  - **What:** Install Prisma in `apps/web`, configure the DB connection to your managed Postgres, and run an initial migration.
-  - **Why:** Prisma will be the source of truth for your data model and migrations.
-  - **Unlocks:** Ability to define schemas and run queries for users, orgs, forms, and submissions.
+  - **What:** Install Prisma in `apps/web`, configure the DB connection using the Supabase Postgres connection string (`DATABASE_URL` from your Supabase project), and run an initial migration.
+  - **Why:** Prisma is the source of truth for your data model and migrations; Supabase provides the Postgres instance and table storage.
+  - **Unlocks:** Ability to define schemas and run queries for users, orgs, forms, and submissions against Supabase.
 
 ---
 
@@ -146,21 +147,21 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T8
 - **Description:**
-  - **What:** Add Prisma models for `User`, `Organization`, and `Membership` (with roles like ADMIN, COLLECTOR) and migrate.
-  - **Why:** These entities are required for multi-tenancy and role-based access control.
+  - **What:** Add Prisma models for `User`, `Organization`, and `Membership` (with roles like ADMIN, COLLECTOR) and migrate. Optionally sync with Supabase Auth users (e.g. via trigger or application logic that creates/updates local User records from `auth.users`).
+  - **Why:** These entities are required for multi-tenancy and role-based access control; tables live in Supabase Postgres.
   - **Unlocks:** Enforces organizational boundaries and lets you scope all data by org and user role.
 
 ---
 
-### T10 – Integrate auth provider in web app
+### T10 – Integrate Supabase Auth in web app
 
 - **Complexity:** Medium
 - **Priority:** P0
 - **Dependencies:** T1, T4, T9
 - **Description:**
-  - **What:** Connect Next.js to your chosen auth provider (e.g. Supabase, Clerk), implement login/logout, and expose current user in server components/API routes.
-  - **Why:** Auth is required to know who is performing actions and to bind them to an org/membership.
-  - **Unlocks:** Access-controlled admin UI and authenticated API calls.
+  - **What:** Connect Next.js to **Supabase Auth** using `@supabase/supabase-js` (and optionally `@supabase/ssr` for server components/cookies). Implement login/logout, and expose current user in server components and API routes (e.g. from session or JWT).
+  - **Why:** Auth is required to know who is performing actions and to bind them to an org/membership; Supabase Auth provides the identity layer.
+  - **Unlocks:** Access-controlled admin UI and authenticated API calls using Supabase sessions/tokens.
 
 ---
 
@@ -182,9 +183,9 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T5, T10
 - **Description:**
-  - **What:** Build login UI in the mobile app and integrate with backend auth (e.g. using access tokens or session endpoints), storing tokens securely.
+  - **What:** Build login UI in the mobile app and integrate with **Supabase Auth** (e.g. `@supabase/supabase-js` with secure token storage such as Expo SecureStore), so collectors sign in via the same Supabase project as the web app.
   - **Why:** Mobile collectors must be authenticated so submissions are tied to known users and orgs.
-  - **Unlocks:** Secure access to forms and submission APIs from the mobile app.
+  - **Unlocks:** Secure access to forms and submission APIs from the mobile app using Supabase sessions.
 
 ---
 
@@ -194,8 +195,8 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T8, T9
 - **Description:**
-  - **What:** Extend Prisma with `Form` and `Submission` models (including fields JSON and submission payload JSON) and define shared TypeScript types (`FormDefinition`, `FormFieldDefinition`, `SubmissionPayload`) in a shared package.
-  - **Why:** This models the the dynamic form structure and stored responses, and keeps contracts consistent across backend/web/mobile.
+  - **What:** Extend Prisma with `Form` and `Submission` models (including fields JSON and submission payload JSON) in Supabase Postgres, and define shared TypeScript types (`FormDefinition`, `FormFieldDefinition`, `SubmissionPayload`) in a shared package.
+  - **Why:** This models the dynamic form structure and stored responses in Supabase tables, and keeps contracts consistent across backend/web/mobile.
   - **Unlocks:** Implementation of APIs and UIs that consume and render arbitrary forms.
 
 ---
@@ -314,7 +315,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T15, T13
 - **Description:**
-  - **What:** Ensure submissions store location fields and implement simple flagging (e.g., poor accuracy, optional distance rules in the future) in the backend.
+  - **What:** Ensure submissions store location fields in Supabase (via Prisma) and implement simple flagging (e.g., poor accuracy, optional distance rules in the future) in the backend.
   - **Why:** Raw coordinates alone are less useful without basic sanity checks and flags.
   - **Unlocks:** Admins can quickly see which submissions might be suspect or need review.
 
@@ -514,6 +515,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ## Summary
 
+- **Backend & data:** Supabase provides Postgres (tables), Auth (web + mobile), and optional Storage; Prisma is used for schema and migrations against Supabase Postgres.
 - **P0 tasks** give you a fully functional, secure data-collection platform with manual form creation, mobile submission (offline + GPS), and admin dashboards.
 - **P1 tasks** layer in AI (voice dictation for form creation and form filling), CSV export, and observability.
 - **P2 tasks** refine the developer experience and UX (design tokens, extended AI flows, deep documentation).

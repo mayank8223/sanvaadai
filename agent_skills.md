@@ -52,7 +52,7 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
 - **Tools / Context:**
   - `implementation.md` (for constraints and data model)
   - TypeScript type definitions (`FormDefinition`, `FormFieldDefinition`)
-  - Prisma schema for `Form`
+  - Prisma schema for `Form` (tables in Supabase Postgres)
 
 - **Quality Criteria:**
   - Fields cover all necessary information but avoid redundancy
@@ -208,7 +208,7 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
   - Documentation of trade-offs and limitations
 
 - **Tools / Context:**
-  - Prisma schema for `Submission` and `flags` JSON
+  - Prisma schema for `Submission` and `flags` JSON (Supabase Postgres)
   - Mapping APIs for visual checks
   - Geo-distance helpers
 
@@ -248,7 +248,7 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
 
 - **Tools / Context:**
   - `implementation.md`
-  - Knowledge of chosen stack (Next.js, React Native, Prisma, Vercel AI SDK)
+  - Knowledge of chosen stack (Next.js, React Native, Supabase for DB + Auth, Prisma, Vercel AI SDK)
 
 - **Quality Criteria:**
   - Tasks are independent and implementable by a developer
@@ -268,7 +268,7 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
   - (2026-02-28) **T7 completed:** NativeWind added to Expo app: tailwind.config.js (preset + theme colors), global.css, babel + metro config, nativewind-env.d.ts. Base components: AppButton, AppInput, Screen, Icon (wrapper for Lucide RN) in `components/`. App.tsx uses SafeAreaProvider, Screen, and new components. See `docs/T7-nativewind-mobile-checklist.md`.
   - (2026-02-28) **T3 completed:** TypeScript strict mode hardened in `packages/tsconfig/base.json` (noFallthroughCasesInSwitch, forceConsistentCasingInFileNames). Prettier at root with `.prettierrc` and `.prettierignore`; root scripts `format` and `format:check`. ESLint in web extended with `eslint-config-prettier`. Typecheck task added to Turbo; `typecheck` scripts in apps/web, apps/mobile, packages/types. GitHub Actions workflow `.github/workflows/lint.yml` runs lint, typecheck, and format:check on push/PR to main or master. See `docs/T3-tooling-checklist.md`.
   - (2026-02-28) **T2 completed:** Monorepo created with Turborepo. Structure: `apps/web` (Next.js, moved from root), `apps/mobile` (Expo blank TypeScript), `packages/tsconfig` (base + nextjs shared configs), `packages/types` (shared types; placeholder until T13). Root has workspaces, turbo.json, and high-level scripts. Expo app was created manually (create-expo-app failed in sandbox); use Expo SDK 52 and React 19 for alignment with web. After creating workspaces, run `bun install` (or npm/pnpm) from root; if install fails (e.g. tarball errors), suggest user retry or use npm.
-  - (2026-02-28) **T1 completed:** T1 is non-code; output is `docs/T1-infrastructure-checklist.md` (provisioning checklist with env var names) and `.env.example` (contract for later tasks). Agent should not write code for “provisioning” – only docs and env placeholders. Actual account/project creation is done by the user in cloud consoles. Later tasks (T4, T8, T10, T27, T28) consume these env vars.
+  - (2026-02-28) **T1 completed:** T1 is non-code; output is `docs/T1-infrastructure-checklist.md` (provisioning checklist with env var names) and `.env.example` (contract for later tasks). **This project uses Supabase for database (tables), auth, and optional storage.** Agent should not write code for “provisioning” – only docs and env placeholders. Actual account/project creation is done by the user in cloud consoles. Later tasks (T4, T8, T10, T12, T27, T28) consume these env vars.
 
 - **Last Updated:** 2026-02-28
 
