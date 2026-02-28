@@ -262,6 +262,7 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
 
 - **Improvement Notes:**  
   - (2026-02-28) Future sessions should attach estimates and owner roles for each task if needed for team planning.
+  - (2026-02-28) **T1 completed:** T1 is non-code; output is `docs/T1-infrastructure-checklist.md` (provisioning checklist with env var names) and `.env.example` (contract for later tasks). Agent should not write code for “provisioning” – only docs and env placeholders. Actual account/project creation is done by the user in cloud consoles. Later tasks (T4, T8, T10, T27, T28) consume these env vars.
 
 - **Last Updated:** 2026-02-28
 
