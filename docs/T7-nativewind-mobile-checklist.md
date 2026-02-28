@@ -9,10 +9,10 @@
 ## 1. NativeWind
 
 - [x] Dependencies added: `nativewind`, `tailwindcss@^3.4.17`, `react-native-reanimated`, `react-native-safe-area-context`, `react-native-svg`, `lucide-react-native`.
-- [x] `tailwind.config.js` with `content` paths and `nativewind/preset`; theme extended with design tokens (primary, secondary, muted, border, input, background, foreground).
+- [x] `tailwind.config.mjs` with `content` paths and `nativewind/preset`; theme extended with design tokens (primary, secondary, muted, border, input, background, foreground).
 - [x] `global.css` with `@tailwind base`, `@tailwind components`, `@tailwind utilities`.
 - [x] `babel.config.js` updated: `babel-preset-expo` with `jsxImportSource: 'nativewind'`, plus `nativewind/babel` preset.
-- [x] `metro.config.js` created with `withNativeWind(config, { input: './global.css' })`.
+- [x] `metro.config.mjs` created with `withNativeWind(config, { input: './global.css' })` (ESM to satisfy ESLint no-require-imports).
 - [x] `nativewind-env.d.ts` added with `/// <reference types="nativewind/types" />`; `tsconfig.json` includes it.
 - [x] `App.tsx` imports `./global.css`. Root wrapped in `SafeAreaProvider` for safe area hooks.
 
