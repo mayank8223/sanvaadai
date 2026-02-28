@@ -1,0 +1,19 @@
+# Dependencies and build outputs
+node_modules
+.next
+out
+.expo
+dist
+build
+.turbo
+*.min.js
+
+# Generated / vendored
+package-lock.json
+bun.lockb
+pnpm-lock.yaml
+.next-env.d.ts
+
+# Coverage and logs
+coverage
+*.log

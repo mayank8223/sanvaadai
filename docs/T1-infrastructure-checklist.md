@@ -37,7 +37,7 @@ Example: `postgresql://user:password@host:5432/dbname?sslmode=require`
 - `S3_REGION` or `STORAGE_REGION`
 - `S3_ACCESS_KEY_ID` or provider-specific
 - `S3_SECRET_ACCESS_KEY` or provider-specific  
-Or for Supabase Storage: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (if using Supabase for storage + auth).
+  Or for Supabase Storage: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (if using Supabase for storage + auth).
 
 ---
 
@@ -51,7 +51,7 @@ Or for Supabase Storage: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`  
-(If using Clerk or Auth0, use their documented env var names.)
+  (If using Clerk or Auth0, use their documented env var names.)
 
 ---
 
@@ -62,9 +62,9 @@ Or for Supabase Storage: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 
 **Env vars:**
 
-- `OPENAI_API_KEY` (if using OpenAI), or  
+- `OPENAI_API_KEY` (if using OpenAI), or
 - `ANTHROPIC_API_KEY` (if using Anthropic), etc.  
-(Vercel AI SDK will use these per provider.)
+  (Vercel AI SDK will use these per provider.)
 
 ---
 
@@ -75,7 +75,7 @@ Or for Supabase Storage: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 
 **Env vars:**
 
-- `OPENAI_API_KEY` (reused if using Whisper), or  
+- `OPENAI_API_KEY` (reused if using Whisper), or
 - Google: `GOOGLE_APPLICATION_CREDENTIALS` / service account JSON path.
 
 ---
@@ -94,7 +94,7 @@ Or for Supabase Storage: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 - [ ] Apple Developer account (for iOS).
 - [ ] Google Play Console account (for Android).
 
-*(Not required for local development; needed when distributing the collector app.)*
+_(Not required for local development; needed when distributing the collector app.)_
 
 ---
 

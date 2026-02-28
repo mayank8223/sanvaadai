@@ -8,13 +8,13 @@
 
 ## 1. Requirements Checklist
 
-| Requirement | Status | Notes |
-|-------------|--------|--------|
-| Monorepo tool (Turborepo or Nx) | ✅ | Turborepo with `turbo.json` |
-| `apps/web` | ✅ | Next.js app (moved from original root) |
-| `apps/mobile` | ✅ | Expo (React Native) with TypeScript |
-| `packages/` for shared code | ✅ | `packages/tsconfig` + `packages/types` |
-| Shared TypeScript types possible | ✅ | `packages/types` ready for T13 (FormDefinition, etc.) |
+| Requirement                      | Status | Notes                                                 |
+| -------------------------------- | ------ | ----------------------------------------------------- |
+| Monorepo tool (Turborepo or Nx)  | ✅     | Turborepo with `turbo.json`                           |
+| `apps/web`                       | ✅     | Next.js app (moved from original root)                |
+| `apps/mobile`                    | ✅     | Expo (React Native) with TypeScript                   |
+| `packages/` for shared code      | ✅     | `packages/tsconfig` + `packages/types`                |
+| Shared TypeScript types possible | ✅     | `packages/types` ready for T13 (FormDefinition, etc.) |
 
 ---
 
@@ -98,15 +98,19 @@
 ## 8. What to Do Locally
 
 1. **Install:** From repo root run:
+
    ```bash
    bun install
    ```
+
    If you see a tarball/extraction error (e.g. xmlbuilder), retry or use a different network; the layout is correct.
 
 2. **Build:**
+
    ```bash
    bun run build
    ```
+
    This runs `turbo build`: builds `packages/types` then `apps/web`. `apps/mobile` has no `build` script (Expo is run via `expo start`).
 
 3. **Dev:**
