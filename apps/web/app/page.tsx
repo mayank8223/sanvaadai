@@ -1,10 +1,20 @@
 import Image from 'next/image';
 
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { APP_NAME } from '@/lib/constants';
+import { CheckCircle2Icon } from 'lucide-react';
 
 const Home = () => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background font-sans">
       <main className="flex w-full max-w-2xl flex-col items-center gap-6 px-6 py-16">
         <Image
           className="dark:invert"
@@ -14,18 +24,43 @@ const Home = () => {
           height={20}
           priority
         />
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {APP_NAME}
         </h1>
-        <p className="text-center text-zinc-600 dark:text-zinc-400">
-          Admin interface and API host. API routes are available under <code className="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-sm dark:bg-zinc-800">/api</code>.
+        <p className="text-center text-muted-foreground">
+          Admin interface and API host. API routes are available under{' '}
+          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">
+            /api
+          </code>
+          .
         </p>
-        <a
-          href="/api/health"
-          className="rounded-full border border-zinc-300 bg-white px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
-        >
-          Check API health
-        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button asChild>
+            <a href="/api/health">Check API health</a>
+          </Button>
+          <Button variant="outline" size="icon" aria-label="Health check">
+            <CheckCircle2Icon />
+          </Button>
+        </div>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>UI stack</CardTitle>
+            <CardDescription>
+              Tailwind CSS, shadcn/ui (Radix), and Lucide icons are configured.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input placeholder="Sample input" readOnly aria-label="Sample" />
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm">
+                Secondary
+              </Button>
+              <Button variant="outline" size="sm">
+                Outline
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
