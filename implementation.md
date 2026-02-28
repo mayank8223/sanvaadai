@@ -8,17 +8,29 @@ This document breaks the work into independent tasks with:
 
 ---
 
+## Stack decision (through T9 and beyond)
+
+**Backend and data (T1–T9):** This project uses **Supabase** as the chosen backend:
+
+- **Database** – Supabase Postgres; access via Supabase client (`@supabase/supabase-js`, `@supabase/ssr`). Schema and migrations are managed in Supabase (Dashboard SQL Editor or Supabase CLI), not Prisma.
+- **Auth** – Supabase Auth for email/password (and optional social logins) on web and mobile.
+- **Storage** – Supabase Storage for media files when needed; optional and can be added later.
+
+There is no separate ORM (e.g. Prisma) for the database; all data access goes through the Supabase client. See `docs/T1-infrastructure-checklist.md`, `docs/T8-supabase-checklist.md`, and `.env.example` for setup.
+
+---
+
 ## Prerequisites – External Setup (Non-code)
 
 Before or alongside implementation, you’ll need to set up the following external resources:
 
 **Backend & data (Supabase):** This project uses **Supabase** for:
 
-- **Managed PostgreSQL database** – tables, migrations, and queries (via Prisma connecting to Supabase Postgres).
+- **Managed PostgreSQL database** – tables and queries via Supabase client (no Prisma). Schema and migrations are managed in the Supabase project (Dashboard SQL Editor or Supabase CLI).
 - **Auth** – Supabase Auth for email/password (and optional social logins) on web and mobile.
-- **Object storage (optional)** – Supabase Storage for media files, or you may use S3/R2 if preferred.
+- **Object storage (optional)** – Supabase Storage for media files when needed; S3/R2 can be used instead if preferred.
 
-One Supabase project provides the database connection string, Auth URL/keys, and optionally storage; see `docs/T1-infrastructure-checklist.md` and `.env.example`.
+One Supabase project provides the database (via client), Auth URL/keys, and optionally storage; see `docs/T1-infrastructure-checklist.md`, `docs/T8-supabase-checklist.md`, and `.env.example`.
 
 **Other external resources:**
 
@@ -51,9 +63,9 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** None
 - **Description:**
-  - **What:** Create a **Supabase project** (for Postgres, Auth, and optionally Storage), a Vercel project (or alternative) for web/API, and obtain LLM + STT provider keys. Use `docs/T1-infrastructure-checklist.md` and `.env.example` as the contract.
-  - **Why:** All subsequent work (DB schemas, auth integration, AI endpoints) depends on having Supabase credentials and API keys.
-  - **Unlocks:** Ability to connect the app to Supabase (tables, auth) and AI services instead of mocks.
+  - **What:** Create a **Supabase project** (for Postgres via Supabase client, Auth, and optionally Storage), a Vercel project (or alternative) for web/API, and obtain LLM + STT provider keys. Use `docs/T1-infrastructure-checklist.md` and `.env.example` as the contract.
+  - **Why:** All subsequent work (DB schema in Supabase, auth integration, AI endpoints) depends on having Supabase credentials and API keys.
+  - **Unlocks:** Ability to connect the app to Supabase (database via client, auth) and AI services instead of mocks.
 
 ---
 
@@ -129,26 +141,26 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ---
 
-### T8 – Setup Prisma and connect to Supabase Postgres
+### T8 – Connect web app to Supabase (database + auth clients)
 
 - **Complexity:** Medium
 - **Priority:** P0
 - **Dependencies:** T1, T4
 - **Description:**
-  - **What:** Install Prisma in `apps/web`, configure the DB connection using the Supabase Postgres connection string (`DATABASE_URL` from your Supabase project), and run an initial migration.
-  - **Why:** Prisma is the source of truth for your data model and migrations; Supabase provides the Postgres instance and table storage.
-  - **Unlocks:** Ability to define schemas and run queries for users, orgs, forms, and submissions against Supabase.
+  - **What:** Install and configure **Supabase** in `apps/web`: `@supabase/supabase-js` and `@supabase/ssr`. Create a browser client (e.g. `createBrowserClient`) for Client Components and a server client (e.g. `createServerClient` with `cookies()`) for Server Components and API routes. Use `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the Supabase project. No Prisma; all database access is via the Supabase client.
+  - **Why:** Supabase is the chosen backend; the web app must use the same project for both database and auth. See `docs/T8-supabase-checklist.md`.
+  - **Unlocks:** Ability to query Supabase Postgres and use Auth from the web app; foundation for T9 (schema), T10 (auth), and T11+ (APIs and guards).
 
 ---
 
-### T9 – Define User, Organization, and Membership schema
+### T9 – Define User, Organization, and Membership schema (Supabase)
 
 - **Complexity:** Medium
 - **Priority:** P0
 - **Dependencies:** T8
 - **Description:**
-  - **What:** Add Prisma models for `User`, `Organization`, and `Membership` (with roles like ADMIN, COLLECTOR) and migrate. Optionally sync with Supabase Auth users (e.g. via trigger or application logic that creates/updates local User records from `auth.users`).
-  - **Why:** These entities are required for multi-tenancy and role-based access control; tables live in Supabase Postgres.
+  - **What:** Define tables in the **Supabase** project for `User` (or link to `auth.users`), `Organization`, and `Membership` (with roles e.g. ADMIN, COLLECTOR). Use Supabase Dashboard SQL Editor or Supabase CLI migrations. Sync application `User` records with Supabase Auth users (e.g. trigger or app logic that creates/updates local User rows from `auth.users`).
+  - **Why:** These entities are required for multi-tenancy and role-based access control; they live in Supabase Postgres and are accessed via the Supabase client.
   - **Unlocks:** Enforces organizational boundaries and lets you scope all data by org and user role.
 
 ---
@@ -159,7 +171,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T1, T4, T9
 - **Description:**
-  - **What:** Connect Next.js to **Supabase Auth** using `@supabase/supabase-js` (and optionally `@supabase/ssr` for server components/cookies). Implement login/logout, and expose current user in server components and API routes (e.g. from session or JWT).
+  - **What:** Connect Next.js to **Supabase Auth** using the Supabase clients from T8 (`@supabase/supabase-js` and `@supabase/ssr` for server components/cookies). Implement login/logout and expose the current user in server components and API routes (from session or JWT).
   - **Why:** Auth is required to know who is performing actions and to bind them to an org/membership; Supabase Auth provides the identity layer.
   - **Unlocks:** Access-controlled admin UI and authenticated API calls using Supabase sessions/tokens.
 
@@ -195,9 +207,9 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T8, T9
 - **Description:**
-  - **What:** Extend Prisma with `Form` and `Submission` models (including fields JSON and submission payload JSON) in Supabase Postgres, and define shared TypeScript types (`FormDefinition`, `FormFieldDefinition`, `SubmissionPayload`) in a shared package.
-  - **Why:** This models the dynamic form structure and stored responses in Supabase tables, and keeps contracts consistent across backend/web/mobile.
-  - **Unlocks:** Implementation of APIs and UIs that consume and render arbitrary forms.
+  - **What:** In **Supabase**, define tables for `Form` and `Submission` (including fields JSON and submission payload JSON) via SQL/migrations. Define shared TypeScript types (`FormDefinition`, `FormFieldDefinition`, `SubmissionPayload`) in a shared package.
+  - **Why:** This models the dynamic form structure and stored responses in Supabase tables and keeps contracts consistent across backend, web, and mobile.
+  - **Unlocks:** Implementation of APIs and UIs that consume and render arbitrary forms via the Supabase client.
 
 ---
 
@@ -315,7 +327,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T15, T13
 - **Description:**
-  - **What:** Ensure submissions store location fields in Supabase (via Prisma) and implement simple flagging (e.g., poor accuracy, optional distance rules in the future) in the backend.
+  - **What:** Ensure submissions store location fields in **Supabase** (via the Supabase client) and implement simple flagging (e.g. poor accuracy, optional distance rules in the future) in the backend.
   - **Why:** Raw coordinates alone are less useful without basic sanity checks and flags.
   - **Unlocks:** Admins can quickly see which submissions might be suspect or need review.
 
@@ -515,7 +527,7 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ## Summary
 
-- **Backend & data:** Supabase provides Postgres (tables), Auth (web + mobile), and optional Storage; Prisma is used for schema and migrations against Supabase Postgres.
+- **Backend & data (T1–T9 and beyond):** **Supabase** is the chosen backend: Postgres (accessed via Supabase client; schema/migrations in Supabase Dashboard or CLI), Auth (web + mobile), and optional Storage. There is no Prisma; all data access uses the Supabase client.
 - **P0 tasks** give you a fully functional, secure data-collection platform with manual form creation, mobile submission (offline + GPS), and admin dashboards.
 - **P1 tasks** layer in AI (voice dictation for form creation and form filling), CSV export, and observability.
 - **P2 tasks** refine the developer experience and UX (design tokens, extended AI flows, deep documentation).
