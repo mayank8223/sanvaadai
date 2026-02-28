@@ -51,10 +51,7 @@ const AppButton = ({
       disabled={disabled}
       {...pressableProps}
     >
-      <Text
-        className={`text-base font-medium ${textColor} ${textClassName}`}
-        numberOfLines={1}
-      >
+      <Text className={`text-base font-medium ${textColor} ${textClassName}`} numberOfLines={1}>
         {label}
       </Text>
     </Pressable>

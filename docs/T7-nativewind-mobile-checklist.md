@@ -36,11 +36,11 @@
 
 ## Commands
 
-| Command | Description |
-|--------|-------------|
-| `bun install` | Install deps (from repo root or `apps/mobile`) |
-| `cd apps/mobile && bun run start` | Start Expo dev server |
-| `bun run ios` / `bun run android` | Run on simulator/device |
+| Command                           | Description                                    |
+| --------------------------------- | ---------------------------------------------- |
+| `bun install`                     | Install deps (from repo root or `apps/mobile`) |
+| `cd apps/mobile && bun run start` | Start Expo dev server                          |
+| `bun run ios` / `bun run android` | Run on simulator/device                        |
 
 ---
 

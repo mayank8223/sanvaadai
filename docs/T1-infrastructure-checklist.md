@@ -31,12 +31,12 @@ This project uses **Supabase** for database, auth, and (optionally) object stora
 
 **Env vars:**
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | Postgres connection string from Supabase (Settings → Database) |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only; for admin or RLS bypass when needed |
+| Variable                        | Description                                                    |
+| ------------------------------- | -------------------------------------------------------------- |
+| `DATABASE_URL`                  | Postgres connection string from Supabase (Settings → Database) |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                                           |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key                                       |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server-only; for admin or RLS bypass when needed               |
 
 ---
 

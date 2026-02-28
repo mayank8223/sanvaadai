@@ -40,10 +40,10 @@
 
 ## Commands
 
-| Command | Description |
-|--------|-------------|
-| `bun install` | Install deps (from repo root or `apps/web`) |
-| `cd apps/web && bun run dev` | Start web dev server |
+| Command                             | Description                                  |
+| ----------------------------------- | -------------------------------------------- |
+| `bun install`                       | Install deps (from repo root or `apps/web`)  |
+| `cd apps/web && bun run dev`        | Start web dev server                         |
 | `npx shadcn@latest add <component>` | Add more components (e.g. `dialog`, `table`) |
 
 ---

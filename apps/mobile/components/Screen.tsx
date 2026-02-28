@@ -10,13 +10,7 @@ export type ScreenProps = ComponentProps<typeof View> & {
 
 const DEFAULT_CLASS = 'flex-1 bg-background';
 
-const Screen = ({
-  safe = true,
-  className = '',
-  style,
-  children,
-  ...viewProps
-}: ScreenProps) => {
+const Screen = ({ safe = true, className = '', style, children, ...viewProps }: ScreenProps) => {
   const insets = useSafeAreaInsets();
 
   const safeStyle = safe
@@ -29,11 +23,7 @@ const Screen = ({
     : undefined;
 
   return (
-    <View
-      className={`${DEFAULT_CLASS} ${className}`}
-      style={[safeStyle, style]}
-      {...viewProps}
-    >
+    <View className={`${DEFAULT_CLASS} ${className}`} style={[safeStyle, style]} {...viewProps}>
       {children}
     </View>
   );

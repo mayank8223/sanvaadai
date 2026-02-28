@@ -37,11 +37,11 @@
 
 ## Commands
 
-| Command              | Description                    |
-| -------------------- | ------------------------------ |
-| `bun run dev`        | Start dev server (from root)   |
-| `cd apps/web && bun run dev` | Start web app only        |
-| `bun run build`      | Build all (Turbo); web → `.next` |
+| Command                      | Description                      |
+| ---------------------------- | -------------------------------- |
+| `bun run dev`                | Start dev server (from root)     |
+| `cd apps/web && bun run dev` | Start web app only               |
+| `bun run build`              | Build all (Turbo); web → `.next` |
 
 ---
 

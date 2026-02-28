@@ -13,12 +13,7 @@ export type IconProps = IconComponentProps & {
 
 const DEFAULT_SIZE = 24;
 
-const Icon = ({
-  as: IconComponent,
-  size = DEFAULT_SIZE,
-  color,
-  strokeWidth,
-}: IconProps) => (
+const Icon = ({ as: IconComponent, size = DEFAULT_SIZE, color, strokeWidth }: IconProps) => (
   <IconComponent size={size} color={color} strokeWidth={strokeWidth} />
 );
 

@@ -56,16 +56,16 @@ bun run db:migrate
 
 **Useful commands:**
 
-| Command | Description |
-|--------|-------------|
+| Command               | Description                                                   |
+| --------------------- | ------------------------------------------------------------- |
 | `bun run db:generate` | Generate a new migration from schema changes (`db/schema.ts`) |
-| `bun run db:migrate` | Apply pending migrations to the database |
-| `bun run db:push` | Push schema directly to DB (dev only; no migration files) |
-| `bun run db:studio` | Open Drizzle Studio to browse data |
+| `bun run db:migrate`  | Apply pending migrations to the database                      |
+| `bun run db:push`     | Push schema directly to DB (dev only; no migration files)     |
+| `bun run db:studio`   | Open Drizzle Studio to browse data                            |
 
 **Adding schema changes:** Edit `apps/web/db/schema.ts`, then run `bun run db:generate`. Review the new SQL in `drizzle/`, then run `bun run db:migrate`. For Supabase-specific SQL (e.g. RLS, triggers, FK to `auth.users`), add a custom migration: `bun run db:generate -- --custom --name=my_change` and edit the generated SQL file.
 
-**Note:** The auth trigger only runs for *new* sign-ups and updates. If you already have rows in `auth.users`, run a one-time backfill in SQL Editor:  
+**Note:** The auth trigger only runs for _new_ sign-ups and updates. If you already have rows in `auth.users`, run a one-time backfill in SQL Editor:  
 `INSERT INTO public.users (id, email, full_name, avatar_url) SELECT id, email, raw_user_meta_data->>'full_name', raw_user_meta_data->>'avatar_url' FROM auth.users ON CONFLICT (id) DO NOTHING;`
 
 ---

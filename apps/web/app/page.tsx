@@ -1,13 +1,7 @@
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { APP_NAME } from '@/lib/constants';
 import { CheckCircle2Icon } from 'lucide-react';
@@ -24,15 +18,10 @@ const Home = () => {
           height={20}
           priority
         />
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {APP_NAME}
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{APP_NAME}</h1>
         <p className="text-center text-muted-foreground">
           Admin interface and API host. API routes are available under{' '}
-          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">
-            /api
-          </code>
-          .
+          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">/api</code>.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild>

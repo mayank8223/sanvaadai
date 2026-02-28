@@ -39,12 +39,12 @@
 
 ## Commands
 
-| Command                    | Description                |
-| -------------------------- | -------------------------- |
-| `cd apps/mobile && bun run start` | Start Expo dev server |
+| Command                            | Description            |
+| ---------------------------------- | ---------------------- |
+| `cd apps/mobile && bun run start`  | Start Expo dev server  |
 | `bun run start` (from apps/mobile) | Same                   |
-| `bun run typecheck`        | Type-check (from root)     |
-| `bun run lint`             | Lint all (from root)       |
+| `bun run typecheck`                | Type-check (from root) |
+| `bun run lint`                     | Lint all (from root)   |
 
 ---
 
