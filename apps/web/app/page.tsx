@@ -1,14 +1,23 @@
 import Image from 'next/image';
 
+import { AuthActions } from '@/components/auth/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { APP_NAME } from '@/lib/constants';
+import { getCurrentUser } from '@/lib/auth/server';
 import { CheckCircle2Icon } from 'lucide-react';
 
-const Home = () => {
+const Home = async () => {
+  const user = await getCurrentUser();
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background font-sans">
+      {user && (
+        <header className="absolute right-4 top-4">
+          <AuthActions userEmail={user.email ?? 'Signed in'} />
+        </header>
+      )}
       <main className="flex w-full max-w-2xl flex-col items-center gap-6 px-6 py-16">
         <Image
           className="dark:invert"

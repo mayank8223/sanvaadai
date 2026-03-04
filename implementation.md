@@ -171,9 +171,21 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 - **Priority:** P0
 - **Dependencies:** T1, T4, T9
 - **Description:**
-  - **What:** Connect Next.js to **Supabase Auth** using the Supabase clients from T8 (`@supabase/supabase-js` and `@supabase/ssr` for server components/cookies). Implement login/logout and expose the current user in server components and API routes (from session or JWT).
-  - **Why:** Auth is required to know who is performing actions and to bind them to an org/membership; Supabase Auth provides the identity layer.
-  - **Unlocks:** Access-controlled admin UI and authenticated API calls using Supabase sessions/tokens.
+  - **What:** Connect Next.js to **Supabase Auth** using the Supabase clients from T8 (`@supabase/supabase-js` and `@supabase/ssr` for server components/cookies). Implement **sign-up** (new admin registration), **login**, and **logout**; expose the current user in server components and API routes (from session or JWT).
+  - **Why:** Auth is required to know who is performing actions and to bind them to an org/membership; new admins are created via sign-up; Supabase Auth provides the identity layer.
+  - **Unlocks:** Access-controlled admin UI, authenticated API calls using Supabase sessions/tokens, and the ability for new users to create an account.
+
+---
+
+### T10a – Web app: Login via Google and other OAuth providers
+
+- **Complexity:** Low
+- **Priority:** P1
+- **Dependencies:** T10
+- **Description:**
+  - **What:** Add **OAuth sign-in** in the web app using Supabase Auth: Google (and optionally GitHub, etc.). Configure providers in Supabase Dashboard; add "Sign in with Google" (and others) on the login page; use the existing `/auth/callback` for the OAuth redirect so the session is stored in cookies.
+  - **Why:** Many teams prefer social login for faster onboarding and fewer passwords to manage.
+  - **Unlocks:** One-click sign-in for admins and collectors (when applied to mobile in T12) using the same Supabase project.
 
 ---
 
