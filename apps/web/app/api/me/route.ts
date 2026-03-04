@@ -1,22 +1,32 @@
 /* ----------------- Globals --------------- */
 import { NextResponse } from 'next/server';
 
-import { getCurrentUser } from '@/lib/auth/server';
+import { withApiGuard } from '@/lib/auth/guards';
 
 /**
  * GET /api/me
- * Returns the currently authenticated user (from session/JWT).
+ * Returns the currently authenticated user plus resolved org/membership context.
  * Responds with 401 when unauthenticated.
  */
-export const GET = async () => {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export const GET = withApiGuard(
+  async ({ context }) => {
+    const { user, memberships, activeMembership, requestedOrganizationId } = context;
+
+    return NextResponse.json({
+      user: {
+        id: user?.id ?? null,
+        email: user?.email ?? null,
+      },
+      membership: {
+        requestedOrganizationId,
+        activeOrganizationId: activeMembership?.organization_id ?? null,
+        role: activeMembership?.role ?? null,
+      },
+      memberships,
+    });
+  },
+  {
+    requireAuth: true,
+    requireMembership: false,
   }
-  return NextResponse.json({
-    user: {
-      id: user.id,
-      email: user.email,
-    },
-  });
-};
+);

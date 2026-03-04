@@ -20,6 +20,11 @@ type ServerClientOptions = SupabaseClientOptions<'public'> & {
   cookieEncoding?: 'raw' | 'base64url';
 };
 
+const PUBLIC_PATH_PREFIXES = ['/login', '/signup', '/auth', '/api/health'];
+
+const isPublicPath = (pathname: string): boolean =>
+  PUBLIC_PATH_PREFIXES.some((publicPathPrefix) => pathname.startsWith(publicPathPrefix));
+
 /**
  * Refreshes the Supabase auth session and applies cookie updates to the response.
  * Call this from middleware on every request so the browser and server stay in sync.
@@ -29,6 +34,7 @@ type ServerClientOptions = SupabaseClientOptions<'public'> & {
 export const updateSession = async (request: NextRequest) => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
+  const pathname = request.nextUrl.pathname;
 
   if (!url || !anonKey) {
     return NextResponse.next({ request });
@@ -58,15 +64,11 @@ export const updateSession = async (request: NextRequest) => {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  // Allow unauthenticated access to login and sign-up
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/signup') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
+  // Allow unauthenticated access to explicitly public routes.
+  if (!user && !isPublicPath(pathname)) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(redirectUrl);
   }
 
