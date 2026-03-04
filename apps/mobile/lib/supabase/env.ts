@@ -16,7 +16,7 @@ const resolvePublicEnv = (primaryKey: string, fallbackKey: string): string => {
 const supabaseUrl = resolvePublicEnv('EXPO_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL');
 const supabaseAnonKey = resolvePublicEnv(
   'EXPO_PUBLIC_SUPABASE_ANON_KEY',
-  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY'
 );
 
 export { supabaseAnonKey, supabaseUrl };

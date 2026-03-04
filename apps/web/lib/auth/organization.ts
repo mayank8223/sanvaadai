@@ -56,16 +56,16 @@ export const resolveRequestedOrganizationId = ({
   fallbackOrganizationId = null,
 }: ResolveOrganizationIdInput): string | null => {
   const requestUrl = new URL(request.url);
-  const queryOrgId = normalizeOrganizationId(requestUrl.searchParams.get(ORGANIZATION_ID_QUERY_PARAM));
+  const queryOrgId = normalizeOrganizationId(
+    requestUrl.searchParams.get(ORGANIZATION_ID_QUERY_PARAM)
+  );
   if (queryOrgId) return queryOrgId;
 
   const headerOrgId = normalizeOrganizationId(request.headers.get(ORGANIZATION_ID_HEADER));
   if (headerOrgId) return headerOrgId;
 
   const cookieHeader = request.headers.get('cookie') ?? '';
-  const cookieOrgId = normalizeOrganizationId(
-    getCookieValue(cookieHeader, ORGANIZATION_ID_COOKIE)
-  );
+  const cookieOrgId = normalizeOrganizationId(getCookieValue(cookieHeader, ORGANIZATION_ID_COOKIE));
   if (cookieOrgId) return cookieOrgId;
 
   return normalizeOrganizationId(fallbackOrganizationId);

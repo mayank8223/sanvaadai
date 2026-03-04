@@ -1,6 +1,5 @@
 /**
  * Shared types for Sanvaadai (web + mobile + API).
- * FormDefinition, FormFieldDefinition, SubmissionPayload will be added in T13.
  */
 
 export type {
@@ -11,3 +10,15 @@ export type {
   MembershipWithOrganization,
 } from './user-org-membership';
 export { MEMBERSHIP_ROLES, type MembershipRole } from './user-org-membership';
+
+export type {
+  FormFieldType,
+  FormStatus,
+  FormFieldDefinition,
+  SelectFormFieldOption,
+  FormDefinition,
+  SubmissionAnswerValue,
+  SubmissionPayload,
+  SubmissionRecord,
+} from './forms-submissions';
+export { FORM_FIELD_TYPES, FORM_STATUSES } from './forms-submissions';

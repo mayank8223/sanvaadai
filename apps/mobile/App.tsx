@@ -15,11 +15,7 @@ const App = () => {
       {session ? (
         <AuthenticatedHome email={email} onSignOut={signOut} />
       ) : (
-        <LoginScreen
-          isLoading={isLoading}
-          errorMessage={errorMessage}
-          onSubmit={signIn}
-        />
+        <LoginScreen isLoading={isLoading} errorMessage={errorMessage} onSubmit={signIn} />
       )}
       <StatusBar style="auto" />
     </SafeAreaProvider>

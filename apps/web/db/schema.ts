@@ -3,11 +3,22 @@
  * Source of truth for table definitions; RLS and auth trigger are in custom migrations.
  */
 
-import { index, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import {
+  index,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 /* ----------------- Enums --------------- */
 
 export const membershipRoleEnum = pgEnum('membership_role', ['ADMIN', 'COLLECTOR']);
+export const formStatusEnum = pgEnum('form_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
 
 /* ----------------- Tables --------------- */
 
@@ -54,5 +65,59 @@ export const memberships = pgTable(
     unique('memberships_user_id_organization_id_key').on(table.user_id, table.organization_id),
     index('idx_memberships_user_id').on(table.user_id),
     index('idx_memberships_organization_id').on(table.organization_id),
+  ]
+);
+
+export const forms = pgTable(
+  'forms',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    organization_id: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
+    created_by_user_id: uuid('created_by_user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    title: text('title').notNull(),
+    description: text('description'),
+    status: formStatusEnum('status').notNull().default('DRAFT'),
+    fields: jsonb('fields').notNull().default([]),
+    version: integer('version').notNull().default(1),
+    published_at: timestamp('published_at', { withTimezone: true }),
+    archived_at: timestamp('archived_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_forms_organization_id').on(table.organization_id),
+    index('idx_forms_status').on(table.status),
+    index('idx_forms_created_by_user_id').on(table.created_by_user_id),
+  ]
+);
+
+export const submissions = pgTable(
+  'submissions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    organization_id: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
+    form_id: uuid('form_id')
+      .notNull()
+      .references(() => forms.id, { onDelete: 'cascade' }),
+    collector_user_id: uuid('collector_user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    payload: jsonb('payload').notNull().default({}),
+    metadata: jsonb('metadata').notNull().default({}),
+    submitted_at: timestamp('submitted_at', { withTimezone: true }).notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_submissions_organization_id').on(table.organization_id),
+    index('idx_submissions_form_id').on(table.form_id),
+    index('idx_submissions_collector_user_id').on(table.collector_user_id),
+    index('idx_submissions_submitted_at').on(table.submitted_at),
   ]
 );

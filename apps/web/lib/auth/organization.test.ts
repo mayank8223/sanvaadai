@@ -11,15 +11,13 @@ import {
 } from './organization';
 
 /* ----------------- Helpers --------------- */
-const createRequest = (
-  {
-    url = 'http://localhost:3000/api/me',
-    headers = {},
-  }: {
-    url?: string;
-    headers?: Record<string, string>;
-  } = {}
-): Request => new Request(url, { headers });
+const createRequest = ({
+  url = 'http://localhost:3000/api/me',
+  headers = {},
+}: {
+  url?: string;
+  headers?: Record<string, string>;
+} = {}): Request => new Request(url, { headers });
 
 const memberships: OrganizationMembership[] = [
   { organization_id: 'org_1', role: 'ADMIN' },
