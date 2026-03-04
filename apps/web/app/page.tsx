@@ -36,6 +36,9 @@ const Home = async () => {
           <Button asChild>
             <a href="/api/health">Check API health</a>
           </Button>
+          <Button asChild variant="secondary">
+            <a href="/forms">Open forms</a>
+          </Button>
           <Button variant="outline" size="icon" aria-label="Health check">
             <CheckCircle2Icon />
           </Button>

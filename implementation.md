@@ -201,6 +201,23 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ---
 
+### T11a – Implement organization + team management flows
+
+- **Complexity:** Medium
+- **Priority:** P0
+- **Dependencies:** T9, T10, T11
+- **Description:**
+  - **What:** Add org lifecycle APIs and admin UI for team management:
+    - Create organization and atomically create creator membership as `ADMIN`.
+    - List current user org memberships and switch active org (`svd_org_id` cookie).
+    - Admin-only member management: add member as `ADMIN`/`COLLECTOR`, update role, remove member.
+    - Add by email flow: if user exists, create membership; if user does not exist, return actionable invite/onboarding response.
+  - **Why:** Core product operations are blocked without explicit org creation and collector assignment flows.
+  - **Unlocks:** End-to-end onboarding: admin signs up → creates org → adds collectors → collectors can sign in and submit.
+  - **Checklist:** `docs/T11a-org-team-management-checklist.md`
+
+---
+
 ### T12 – Implement auth flow in mobile app
 
 - **Complexity:** Medium
