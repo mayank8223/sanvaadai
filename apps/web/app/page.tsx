@@ -1,15 +1,25 @@
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 
 import { AuthActions } from '@/components/auth/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { getUserMemberships } from '@/lib/auth/organization';
 import { APP_NAME } from '@/lib/constants';
 import { getCurrentUser } from '@/lib/auth/server';
 import { CheckCircle2Icon } from 'lucide-react';
 
+const CREATE_ORGANIZATION_PATH = '/onboarding/organization';
+
 const Home = async () => {
   const user = await getCurrentUser();
+  if (user) {
+    const memberships = await getUserMemberships(user.id);
+    if (memberships.length === 0) {
+      redirect(CREATE_ORGANIZATION_PATH);
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background font-sans">

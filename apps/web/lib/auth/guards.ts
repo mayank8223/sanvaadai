@@ -2,12 +2,14 @@
 import { NextResponse } from 'next/server';
 
 import { getCurrentUser } from '@/lib/auth/server';
+import { createClient } from '@/lib/supabase/server';
 
 import {
   type AuthOrganizationContext,
   type MembershipRole,
   resolveAuthOrganizationContext,
 } from './organization';
+import { syncUserProfile } from './user-sync';
 
 /* ----------------- Types --------------- */
 export type ApiGuardOptions = {
@@ -80,6 +82,16 @@ export const withApiGuard = (handler: GuardedApiHandler, options: ApiGuardOption
 
   return async (request: Request) => {
     const user = await getCurrentUser();
+
+    if (user) {
+      try {
+        const supabase = await createClient();
+        await syncUserProfile(supabase, user);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to sync user profile';
+        return NextResponse.json({ error: message }, { status: 500 });
+      }
+    }
 
     const baseContext: AuthOrganizationContext = {
       user,
