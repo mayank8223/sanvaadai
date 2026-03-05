@@ -5,6 +5,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 /* ----------------- Types --------------- */
 type TeamMember = {
@@ -171,20 +178,23 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="sm:w-40">
           <label htmlFor="member-role" className="text-sm font-medium">
             Role
           </label>
-          <select
-            id="member-role"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+          <Select
             value={role}
-            onChange={(event) => setRole(event.target.value as 'ADMIN' | 'COLLECTOR')}
+            onValueChange={(value) => setRole(value as 'ADMIN' | 'COLLECTOR')}
             disabled={isSubmitting}
           >
-            <option value="COLLECTOR">Collector</option>
-            <option value="ADMIN">Admin</option>
-          </select>
+            <SelectTrigger id="member-role" className="h-10 w-full bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="COLLECTOR">Collector</SelectItem>
+              <SelectItem value="ADMIN">Admin</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Button type="submit" disabled={isSubmitting}>

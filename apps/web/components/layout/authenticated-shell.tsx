@@ -11,33 +11,53 @@ import {
   ONBOARDING_ORGANIZATION_PATH,
 } from '@/lib/auth/home-routing';
 import type { OrganizationOption } from '@/lib/auth/shell';
+import { cn } from '@/lib/utils';
+
+/* ----------------- Constants --------------- */
+const ACTIVE_LINK_CLASSNAME = 'bg-primary/10 text-primary font-medium';
+const INACTIVE_LINK_CLASSNAME = 'text-muted-foreground hover:text-foreground';
 
 /* ----------------- Types --------------- */
+type NavItem = {
+  href: string;
+  label: string;
+  match: 'exact' | 'prefix';
+};
+
 export type AuthenticatedShellProps = {
   userEmail: string | null;
   memberships: OrganizationOption[];
   activeMembership: OrganizationOption | null;
+  currentPath: string;
   children: React.ReactNode;
 };
 
 /* ----------------- Helpers --------------- */
-const getPrimaryNav = (role: OrganizationOption['role'] | null) => {
+const getPrimaryNav = (role: OrganizationOption['role'] | null): NavItem[] => {
   if (role === 'ADMIN') {
     return [
-      { href: ADMIN_HOME_PATH, label: 'Home' },
-      { href: '/forms', label: 'Forms' },
-      { href: '/settings/team', label: 'Team' },
+      { href: ADMIN_HOME_PATH, label: 'Home', match: 'exact' },
+      { href: '/forms', label: 'Forms', match: 'prefix' },
+      { href: '/settings/team', label: 'Team', match: 'prefix' },
     ];
   }
 
   if (role === 'COLLECTOR') {
     return [
-      { href: COLLECTOR_HOME_PATH, label: 'Home' },
-      { href: '/forms', label: 'Forms' },
+      { href: COLLECTOR_HOME_PATH, label: 'Home', match: 'exact' },
+      { href: '/forms', label: 'Forms', match: 'prefix' },
     ];
   }
 
-  return [{ href: ONBOARDING_ORGANIZATION_PATH, label: 'Get started' }];
+  return [{ href: ONBOARDING_ORGANIZATION_PATH, label: 'Get started', match: 'prefix' }];
+};
+
+const isNavItemActive = (item: NavItem, currentPath: string): boolean => {
+  if (item.match === 'exact') {
+    return currentPath === item.href;
+  }
+
+  return currentPath === item.href || currentPath.startsWith(`${item.href}/`);
 };
 
 /* ----------------- Component --------------- */
@@ -45,6 +65,7 @@ export const AuthenticatedShell = ({
   userEmail,
   memberships,
   activeMembership,
+  currentPath,
   children,
 }: AuthenticatedShellProps) => {
   const activeOrganizationName = activeMembership?.organization?.name ?? 'No active organization';
@@ -81,15 +102,23 @@ export const AuthenticatedShell = ({
             </div>
           </div>
           <nav aria-label="Primary" className="flex flex-wrap items-center gap-4 text-sm">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = isNavItemActive(item, currentPath);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={cn(
+                    'rounded-md px-2 py-1 transition-colors',
+                    isActive ? ACTIVE_LINK_CLASSNAME : INACTIVE_LINK_CLASSNAME
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </header>

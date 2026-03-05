@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ADMIN_HOME_PATH,
+  COLLECTOR_HOME_PATH,
   HOME_PATH,
   LOGIN_PATH,
   ONBOARDING_ORGANIZATION_PATH,
@@ -76,6 +77,7 @@ const CollectorHomePage = async () => {
       userEmail={user.email ?? null}
       memberships={shellContext.memberships}
       activeMembership={activeMembership}
+      currentPath={COLLECTOR_HOME_PATH}
     >
       <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
         <Card id="assigned-forms">

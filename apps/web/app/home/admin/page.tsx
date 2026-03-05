@@ -6,6 +6,7 @@ import { AuthenticatedShell } from '@/components/layout/authenticated-shell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  ADMIN_HOME_PATH,
   COLLECTOR_HOME_PATH,
   HOME_PATH,
   LOGIN_PATH,
@@ -87,6 +88,7 @@ const AdminHomePage = async () => {
       userEmail={user.email ?? null}
       memberships={shellContext.memberships}
       activeMembership={activeMembership}
+      currentPath={ADMIN_HOME_PATH}
     >
       <section className="grid gap-4 md:grid-cols-3">
         <Card>

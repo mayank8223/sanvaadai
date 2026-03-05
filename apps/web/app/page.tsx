@@ -30,6 +30,7 @@ const HomePage = async () => {
       userEmail={user.email ?? null}
       memberships={shellContext.memberships}
       activeMembership={shellContext.activeMembership}
+      currentPath={HOME_PATH}
     >
       <section className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         {routeDecision.state === 'no-membership' ? (

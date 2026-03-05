@@ -113,6 +113,7 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
       userEmail={user.email ?? null}
       memberships={shellContext.memberships}
       activeMembership={activeMembership}
+      currentPath={FORMS_PATH}
     >
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
