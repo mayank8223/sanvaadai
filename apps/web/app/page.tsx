@@ -1,80 +1,66 @@
-import Image from 'next/image';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { AuthActions } from '@/components/auth/auth-actions';
+import { AuthenticatedShell } from '@/components/layout/authenticated-shell';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { getUserMemberships } from '@/lib/auth/organization';
-import { APP_NAME } from '@/lib/constants';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  HOME_PATH,
+  LOGIN_PATH,
+  ONBOARDING_ORGANIZATION_PATH,
+  resolveHomeRouteDecision,
+} from '@/lib/auth/home-routing';
 import { getCurrentUser } from '@/lib/auth/server';
-import { CheckCircle2Icon } from 'lucide-react';
+import { loadShellContext } from '@/lib/auth/shell';
 
-const CREATE_ORGANIZATION_PATH = '/onboarding/organization';
-
-const Home = async () => {
+const HomePage = async () => {
   const user = await getCurrentUser();
-  if (user) {
-    const memberships = await getUserMemberships(user.id);
-    if (memberships.length === 0) {
-      redirect(CREATE_ORGANIZATION_PATH);
-    }
+  if (!user) {
+    redirect(`${LOGIN_PATH}?next=${encodeURIComponent(HOME_PATH)}`);
+  }
+
+  const shellContext = await loadShellContext(user.id);
+  const routeDecision = resolveHomeRouteDecision(shellContext);
+  if (routeDecision.type === 'redirect') {
+    redirect(routeDecision.destination);
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background font-sans">
-      {user && (
-        <header className="absolute right-4 top-4">
-          <AuthActions userEmail={user.email ?? 'Signed in'} />
-        </header>
-      )}
-      <main className="flex w-full max-w-2xl flex-col items-center gap-6 px-6 py-16">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{APP_NAME}</h1>
-        <p className="text-center text-muted-foreground">
-          Admin interface and API host. API routes are available under{' '}
-          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">/api</code>.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button asChild>
-            <a href="/api/health">Check API health</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/forms">Open forms</a>
-          </Button>
-          <Button variant="outline" size="icon" aria-label="Health check">
-            <CheckCircle2Icon />
-          </Button>
-        </div>
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>UI stack</CardTitle>
-            <CardDescription>
-              Tailwind CSS, shadcn/ui (Radix), and Lucide icons are configured.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input placeholder="Sample input" readOnly aria-label="Sample" />
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm">
-                Secondary
-              </Button>
-              <Button variant="outline" size="sm">
-                Outline
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+    <AuthenticatedShell
+      userEmail={user.email ?? null}
+      memberships={shellContext.memberships}
+      activeMembership={shellContext.activeMembership}
+    >
+      <section className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        {routeDecision.state === 'no-membership' ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Set up your organization</CardTitle>
+              <CardDescription>
+                You are signed in but not part of any organization yet. Create your organization to
+                continue, or ask an admin to invite you.
+              </CardDescription>
+              <div className="pt-2">
+                <Button asChild>
+                  <Link href={ONBOARDING_ORGANIZATION_PATH}>Create organization</Link>
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Organization selection is out of date</CardTitle>
+              <CardDescription>
+                Your current organization selection is no longer valid. Switch organization from the
+                header to continue.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
+      </section>
+    </AuthenticatedShell>
   );
 };
 
-export default Home;
+export default HomePage;

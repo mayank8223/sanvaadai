@@ -278,6 +278,62 @@ Some of these are captured as tasks below (e.g. wiring DB and auth into the code
 
 ---
 
+### T16a – Web app shell: header, footer, org + role context
+
+- **Complexity:** Medium
+- **Priority:** P0
+- **Dependencies:** T10, T11, T11a, T6
+- **Description:**
+  - **What:** Build a shared authenticated layout with:
+    - Header (logo/nav, org switcher, active organization name, role badge, user menu).
+    - Footer (product/version/help/privacy links).
+    - Organization + role context loaded from `/api/me` and memberships.
+  - **Why:** Users need persistent context (which org, what role) and consistent navigation.
+  - **Unlocks:** Foundation for all role-specific pages and cleaner product UX.
+
+---
+
+### T16b – Auth UX guards: redirect logged-in users away from `/login` and `/signup`
+
+- **Complexity:** Low
+- **Priority:** P0
+- **Dependencies:** T10, T11
+- **Description:**
+  - **What:** Add server-side route gating so authenticated users cannot access `/login` or `/signup`; redirect to `/` (or role home route).
+  - **Why:** Prevents confusing auth loops and aligns with expected signed-in behavior.
+  - **Unlocks:** Predictable authentication navigation and cleaner onboarding flow.
+
+---
+
+### T16c – Role-based home page router (admin vs collector)
+
+- **Complexity:** Medium
+- **Priority:** P0
+- **Dependencies:** T11, T11a, T16a, T16b
+- **Description:**
+  - **What:** Implement `/` as a role-aware entry:
+    - Admin users: welcome dashboard with org summary and quick actions.
+    - Collector users: collector home with assigned/published forms and submission shortcuts.
+    - No-membership users: onboarding state to create org or await invite.
+  - **Why:** Different roles have different first actions; a single generic page is ineffective.
+  - **Unlocks:** Fast first-step experience for both admin and collector personas.
+
+---
+
+### T16d – Web role-specific home screens (content + navigation)
+
+- **Complexity:** Medium
+- **Priority:** P1
+- **Dependencies:** T16c, T14, T15
+- **Description:**
+  - **What:** Add dedicated screens/components:
+    - Admin home (`/home/admin`): forms count, recent submissions, team status, CTA to create form/manage team.
+    - Collector home (`/home/collector`): assigned forms, recent submissions by self, CTA to continue/submit.
+  - **Why:** Explicit role homes reduce friction and make permissions visible in UI.
+  - **Unlocks:** Better day-1 usability and a scalable IA for future modules.
+
+---
+
 ### T17 – Admin web: Manual form builder UI
 
 - **Complexity:** High

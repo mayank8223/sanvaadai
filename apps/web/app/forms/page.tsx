@@ -1,14 +1,14 @@
 /* ----------------- Globals --------------- */
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 
-import { AuthActions } from '@/components/auth/auth-actions';
-import { OrgSwitcher, type OrganizationOption } from '@/components/organization/org-switcher';
+import { AuthenticatedShell } from '@/components/layout/authenticated-shell';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ORGANIZATION_ID_COOKIE } from '@/lib/auth/organization';
+import { COLLECTOR_HOME_PATH, LOGIN_PATH, ONBOARDING_ORGANIZATION_PATH } from '@/lib/auth/home-routing';
 import { getCurrentUser } from '@/lib/auth/server';
+import { loadShellContext } from '@/lib/auth/shell';
 import {
   getFormSubmissionCount,
   parseFormsListFilters,
@@ -18,10 +18,9 @@ import {
 import { createClient } from '@/lib/supabase/server';
 
 /* ----------------- Constants --------------- */
-const LOGIN_PATH = '/login';
 const FORMS_PATH = '/forms';
+const NEW_FORM_PATH = '/forms/new';
 const TEAM_SETTINGS_PATH = '/settings/team';
-const ONBOARDING_ORGANIZATION_PATH = '/onboarding/organization';
 const STATUS_FILTER_OPTIONS = ['ALL', 'DRAFT', 'PUBLISHED', 'ARCHIVED'] as const;
 const FORM_SELECT_COLUMNS = 'id, title, status, created_at, submissions(count)';
 
@@ -35,46 +34,18 @@ const formatIsoDate = (value: string): string =>
 
 const getStatusBadgeClassName = (status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') => {
   if (status === 'PUBLISHED') {
-    return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200';
+    return 'bg-green-500 text-green-800 dark:bg-green-500 dark:text-green-200';
   }
 
   if (status === 'ARCHIVED') {
-    return 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200';
+    return 'bg-gray-500 text-gray-800 dark:bg-gray-500 dark:text-gray-200';
   }
 
-  return 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200';
+  return 'bg-yellow-500 text-yellow-800 dark:bg-yellow-500 dark:text-yellow-200';
 };
 
 const getFilterHref = (status: (typeof STATUS_FILTER_OPTIONS)[number]) =>
   status === 'ALL' ? FORMS_PATH : `${FORMS_PATH}?status=${encodeURIComponent(status)}`;
-
-const getActiveMembership = (
-  memberships: OrganizationOption[],
-  requestedOrganizationId: string | null
-) => {
-  if (!requestedOrganizationId) {
-    return memberships[0] ?? null;
-  }
-
-  return (
-    memberships.find((membership) => membership.organization_id === requestedOrganizationId) ??
-    memberships[0] ??
-    null
-  );
-};
-
-const normalizeOrganizationOptions = (
-  memberships: Array<{
-    organization_id: string;
-    role: 'ADMIN' | 'COLLECTOR';
-    organizations: Array<{ id: string; name: string; slug: string | null }> | null;
-  }>
-): OrganizationOption[] =>
-  memberships.map((membership) => ({
-    organization_id: membership.organization_id,
-    role: membership.role,
-    organization: membership.organizations?.[0] ?? null,
-  }));
 
 const loadForms = async (
   organizationId: string,
@@ -110,57 +81,15 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
     redirect(`${LOGIN_PATH}?next=${encodeURIComponent(FORMS_PATH)}`);
   }
 
-  const supabase = await createClient();
-  const { data: membershipsData, error: membershipsError } = await supabase
-    .from('memberships')
-    .select('organization_id, role, organizations:organization_id(id, name, slug)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true });
-
-  if (membershipsError) {
-    return (
-      <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-6 py-16">
-        <Card className="w-full max-w-xl">
-          <CardHeader>
-            <CardTitle>Failed to load memberships</CardTitle>
-            <CardDescription>{membershipsError.message}</CardDescription>
-          </CardHeader>
-        </Card>
-      </main>
-    );
-  }
-
-  const memberships = normalizeOrganizationOptions(
-    (membershipsData ?? []) as Array<{
-      organization_id: string;
-      role: 'ADMIN' | 'COLLECTOR';
-      organizations: Array<{ id: string; name: string; slug: string | null }> | null;
-    }>
-  );
-  const cookieStore = await cookies();
-  const requestedOrganizationId = cookieStore.get(ORGANIZATION_ID_COOKIE)?.value ?? null;
-  const activeMembership = getActiveMembership(memberships, requestedOrganizationId);
+  const shellContext = await loadShellContext(user.id);
+  const activeMembership = shellContext.activeMembership;
 
   if (!activeMembership) {
     redirect(ONBOARDING_ORGANIZATION_PATH);
   }
 
   if (activeMembership.role !== 'ADMIN') {
-    return (
-      <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center gap-6 px-6 py-16">
-        <Card className="w-full max-w-xl">
-          <CardHeader>
-            <CardTitle>Admin access required</CardTitle>
-            <CardDescription>
-              You need an admin membership to view the forms management page.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-        <Button asChild variant="outline">
-          <Link href="/">Back to dashboard</Link>
-        </Button>
-      </main>
-    );
+    redirect(COLLECTOR_HOME_PATH);
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : {};
@@ -174,9 +103,13 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
   } catch (error) {
     loadError = error instanceof Error ? error.message : 'Failed to load forms';
   }
-
+  console.log('activeMembership--tt', activeMembership);
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-6 py-12">
+    <AuthenticatedShell
+      userEmail={user.email ?? null}
+      memberships={shellContext.memberships}
+      activeMembership={activeMembership}
+    >
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Forms</h1>
@@ -184,21 +117,17 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
             Browse and manage forms for your organization.
           </p>
         </div>
-        <div className="flex flex-col items-start gap-2 sm:items-end">
-          <OrgSwitcher
-            memberships={memberships}
-            activeOrganizationId={activeMembership.organization_id}
-          />
-          <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href={TEAM_SETTINGS_PATH}>Team settings</Link>
-            </Button>
-            <AuthActions userEmail={user.email ?? 'Signed in'} />
-          </div>
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm">
+            <Link href={NEW_FORM_PATH}>Create form</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href={TEAM_SETTINGS_PATH}>Team settings</Link>
+          </Button>
         </div>
       </header>
 
-      <section className="flex flex-wrap items-center gap-2">
+      <section className="flex flex-wrap items-center gap-2 py-2">
         {STATUS_FILTER_OPTIONS.map((statusOption) => (
           <Button
             key={statusOption}
@@ -232,6 +161,7 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
                     <th className="px-2 py-3 font-medium">Status</th>
                     <th className="px-2 py-3 font-medium">Created</th>
                     <th className="px-2 py-3 font-medium text-right">Submissions</th>
+                    <th className="px-2 py-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -239,17 +169,20 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
                     <tr key={form.id} className="border-b">
                       <td className="px-2 py-3 font-medium text-foreground">{form.title}</td>
                       <td className="px-2 py-3">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeClassName(form.status)}`}
-                        >
+                        <Badge variant="primary" className={getStatusBadgeClassName(form.status)}>
                           {form.status}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-2 py-3 text-muted-foreground">
                         {formatIsoDate(form.created_at)}
                       </td>
                       <td className="px-2 py-3 text-right text-foreground">
                         {getFormSubmissionCount(form)}
+                      </td>
+                      <td className="px-2 py-3 text-right">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/forms/${form.id}/edit`}>Edit</Link>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -259,7 +192,7 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
           )}
         </CardContent>
       </Card>
-    </main>
+    </AuthenticatedShell>
   );
 };
 

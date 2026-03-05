@@ -4,6 +4,9 @@
  */
 
 export const APP_NAME = 'Sanvaadai Admin';
+export const APP_VERSION = 'Sanvaadai v0.1.0';
+export const HELP_URL = 'https://trigger.dev/docs/manual-setup';
+export const PRIVACY_URL = '/privacy';
 
 export const DEFAULT_METADATA = {
   title: APP_NAME,

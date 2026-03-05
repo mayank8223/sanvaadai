@@ -67,8 +67,9 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
 
 - **Improvement Notes:**
   - (2026-02-28) Initial definition created. Future sessions should add concrete examples of good/bad form designs from real use cases.
+  - (2026-03-04) UI refinement guideline: when rendering dynamic form field types in admin/collector interfaces, always map each type to a semantic icon (e.g., Lucide `Type`, `Hash`, `CalendarDays`, `ListChecks`, `Paperclip`, `MapPin`) to improve scanability and reduce configuration mistakes.
 
-- **Last Updated:** 2026-02-28
+- **Last Updated:** 2026-03-04
 
 ---
 
@@ -280,8 +281,11 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
   - (2026-03-04) **T14 completed:** Implemented Forms CRUD API routes in `apps/web/app/api/forms/*` with org scoping via `withApiGuard`: list/create, get/update, and status transitions (`/status`). Admin-only mutation routes enforced with `allowedRoles: ['ADMIN']`; collector access is restricted to published forms. Added reusable request validators in `apps/web/lib/forms/contracts.ts` and unit tests in `apps/web/lib/forms/contracts.test.ts`. See `docs/T14-forms-crud-api-checklist.md`.
   - (2026-03-04) **T15 completed:** Implemented Submissions API in `apps/web/app/api/submissions/*`: create submission (`POST /api/submissions`), list submissions with filters + pagination (`GET /api/submissions`, admin-only), and export skeleton (`GET /api/submissions/export`, admin-only) for T26 follow-up. Added request/query parsers in `apps/web/lib/submissions/contracts.ts` and unit tests in `apps/web/lib/submissions/contracts.test.ts`. See `docs/T15-submissions-api-checklist.md`.
   - (2026-03-04) **T16 completed:** Added admin forms list page at `apps/web/app/forms/page.tsx` with org-scoped server rendering, status filter (`ALL`, `DRAFT`, `PUBLISHED`, `ARCHIVED`), submission counts, and access gating (login redirect, membership/admin checks). Added reusable listing helpers in `apps/web/lib/forms/listing.ts` with tests in `apps/web/lib/forms/listing.test.ts`. Linked dashboard home to `/forms`. See `docs/T16-forms-list-page-checklist.md`.
+  - (2026-03-04) **T17 completed:** Added manual form builder flow for admins with create/edit pages (`/forms/new`, `/forms/[id]/edit`), field palette (`text`, `number`, `date`, `select`, `file`, `location`), field-level configuration, and live preview in `apps/web/components/forms/form-builder-screen.tsx`. Added reusable builder SDK utilities in `apps/web/lib/forms/builder.ts` and state orchestration hook in `apps/web/hooks/useFormBuilder.ts`; extended forms list page with create/edit actions. Added unit tests in `apps/web/lib/forms/builder.test.ts`. See `docs/T17-form-builder-checklist.md`.
+  - (2026-03-04) **T18 completed:** Implemented collector forms listing on mobile with Supabase-backed fetch flow in `apps/mobile/hooks/useCollectorForms.ts` (membership-aware published form fetch), new UI screen `apps/mobile/features/forms/FormsScreen.tsx`, and authenticated integration via `apps/mobile/App.tsx` + `apps/mobile/features/auth/AuthenticatedHome.tsx`. Added metadata helpers/tests in `apps/mobile/lib/forms/helpers.ts` and `apps/mobile/lib/forms/helpers.test.ts`. See `docs/T18-mobile-forms-list-checklist.md`.
+  - (2026-03-05) **T16a/T16b/T16c/T16d completed:** Added reusable authenticated web shell in `apps/web/components/layout/authenticated-shell.tsx` with org badge/switcher, role badge, auth actions, and footer links. Added auth-page UX guards for signed-in users on `/login` and `/signup` via server-side session checks (`apps/web/app/login/page.tsx`, `apps/web/app/signup/page.tsx`). Reworked `/` into server-driven role router with explicit no-membership and invalid-org states (`apps/web/app/page.tsx`, `apps/web/lib/auth/home-routing.ts`, `apps/web/lib/auth/shell.ts`) and added dedicated role homes (`/home/admin`, `/home/collector`). Added unit tests for route decisions and auth redirects in `apps/web/lib/auth/home-routing.test.ts` and `apps/web/lib/auth/auth-routes.test.ts`. See `docs/T16a-app-shell-and-role-home-checklist.md`.
 
-- **Last Updated:** 2026-03-04
+- **Last Updated:** 2026-03-05
 
 ---
 

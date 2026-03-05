@@ -19,3 +19,11 @@ export const AUTH_COPY = {
   invalidCredentialsMessage: 'Invalid email or password.',
   genericAuthErrorMessage: 'Unable to authenticate. Please try again.',
 } as const;
+
+export const FORMS_COPY = {
+  title: 'Available forms',
+  subtitle: 'Published forms assigned to your organization',
+  emptyState: 'No published forms are available right now.',
+  loadingState: 'Loading forms...',
+  refreshLabel: 'Refresh forms',
+} as const;
