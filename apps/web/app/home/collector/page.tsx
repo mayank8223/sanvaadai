@@ -141,7 +141,9 @@ const CollectorHomePage = async () => {
                     <span className="font-medium text-foreground">
                       {formNameById.get(submission.form_id) ?? 'Form'}
                     </span>
-                    <span className="text-muted-foreground">{formatDateTime(submission.submitted_at)}</span>
+                    <span className="text-muted-foreground">
+                      {formatDateTime(submission.submitted_at)}
+                    </span>
                   </li>
                 ))}
               </ul>

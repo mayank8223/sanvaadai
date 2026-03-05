@@ -91,7 +91,11 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
           <Button asChild variant="outline">
             <Link href={STATUS_BACK_PATH}>Back to forms</Link>
           </Button>
-          <Button disabled={isSubmitting} variant="outline" onClick={() => void submitForm('DRAFT')}>
+          <Button
+            disabled={isSubmitting}
+            variant="outline"
+            onClick={() => void submitForm('DRAFT')}
+          >
             {isSubmitting ? 'Saving...' : 'Save draft'}
           </Button>
           <Button disabled={isSubmitting} onClick={() => void submitForm('PUBLISHED')}>
@@ -119,7 +123,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
             <CardDescription>Add fields to this form definition.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {FORM_FIELD_TYPES.map((fieldType) => (
+            {FORM_FIELD_TYPES.map((fieldType) =>
               (() => {
                 const FieldTypeIcon = FIELD_TYPE_ICONS[fieldType];
                 return (
@@ -135,7 +139,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                   </Button>
                 );
               })()
-            ))}
+            )}
           </CardContent>
         </Card>
 
@@ -173,7 +177,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
             <div className="space-y-2">
               <p className="text-sm font-medium text-foreground">Fields ({fields.length})</p>
               <div className="max-h-64 space-y-2 overflow-auto pr-1">
-                {fields.map((field, index) => (
+                {fields.map((field, index) =>
                   (() => {
                     const FieldTypeIcon = FIELD_TYPE_ICONS[field.type];
                     return (
@@ -191,11 +195,13 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                           <FieldTypeIcon className="size-4 text-muted-foreground" />
                           {field.label || `Field ${index + 1}`}
                         </span>
-                        <span className="ml-6 text-xs uppercase text-muted-foreground">{field.type}</span>
+                        <span className="ml-6 text-xs uppercase text-muted-foreground">
+                          {field.type}
+                        </span>
                       </button>
                     );
                   })()
-                ))}
+                )}
               </div>
             </div>
 
@@ -358,10 +364,12 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
             </div>
 
             {fields.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Add fields from the palette to preview the form.</p>
+              <p className="text-sm text-muted-foreground">
+                Add fields from the palette to preview the form.
+              </p>
             ) : (
               <div className="space-y-3">
-                {fields.map((field) => (
+                {fields.map((field) =>
                   (() => {
                     const FieldTypeIcon = FIELD_TYPE_ICONS[field.type];
                     return (
@@ -369,14 +377,20 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                         <p className="flex items-center gap-2 text-sm font-medium">
                           <FieldTypeIcon className="size-4 text-muted-foreground" />
                           {field.label}{' '}
-                          {field.required ? <span className="text-xs text-destructive">*</span> : null}
+                          {field.required ? (
+                            <span className="text-xs text-destructive">*</span>
+                          ) : null}
                         </p>
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">{field.type}</p>
-                        {field.help_text && <p className="text-xs text-muted-foreground">{field.help_text}</p>}
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                          {field.type}
+                        </p>
+                        {field.help_text && (
+                          <p className="text-xs text-muted-foreground">{field.help_text}</p>
+                        )}
                       </div>
                     );
                   })()
-                ))}
+                )}
               </div>
             )}
           </CardContent>

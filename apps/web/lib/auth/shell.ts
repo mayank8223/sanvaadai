@@ -1,10 +1,7 @@
 /* ----------------- Globals --------------- */
 import { cookies } from 'next/headers';
 
-import {
-  ORGANIZATION_ID_COOKIE,
-  type MembershipRole,
-} from '@/lib/auth/organization';
+import { ORGANIZATION_ID_COOKIE, type MembershipRole } from '@/lib/auth/organization';
 import { createClient } from '@/lib/supabase/server';
 
 /* ----------------- Types --------------- */
@@ -69,7 +66,8 @@ export const loadShellContext = async (userId: string): Promise<ShellContext> =>
   const cookieStore = await cookies();
   const requestedOrganizationId = cookieStore.get(ORGANIZATION_ID_COOKIE)?.value ?? null;
   const selectedMembership = requestedOrganizationId
-    ? memberships.find((membership) => membership.organization_id === requestedOrganizationId) ?? null
+    ? (memberships.find((membership) => membership.organization_id === requestedOrganizationId) ??
+      null)
     : null;
   const activeMembership = selectedMembership ?? memberships[0] ?? null;
 

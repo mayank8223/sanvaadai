@@ -34,8 +34,7 @@ const readMetadataString = (value: unknown): string | null => {
 export const toUserProfileRow = (user: SupabaseAuthUser): UserProfileRow => {
   const metadata = user.user_metadata ?? {};
   const fullName = readMetadataString(metadata.full_name) ?? readMetadataString(metadata.name);
-  const avatarUrl =
-    readMetadataString(metadata.avatar_url) ?? readMetadataString(metadata.picture);
+  const avatarUrl = readMetadataString(metadata.avatar_url) ?? readMetadataString(metadata.picture);
 
   return {
     id: user.id,

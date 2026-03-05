@@ -6,9 +6,7 @@ import type { User as SupabaseAuthUser } from '@supabase/supabase-js';
 import { toUserProfileRow } from './user-sync';
 
 /* ----------------- Helpers --------------- */
-const createAuthUser = (
-  overrides: Partial<SupabaseAuthUser> = {}
-): SupabaseAuthUser =>
+const createAuthUser = (overrides: Partial<SupabaseAuthUser> = {}): SupabaseAuthUser =>
   ({
     id: 'user_1',
     app_metadata: {},

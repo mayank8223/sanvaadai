@@ -36,7 +36,9 @@ const FormsScreen = ({ forms, isLoading, errorMessage, onRefresh }: FormsScreenP
       />
     </View>
 
-    {isLoading ? <Text className="text-sm text-muted-foreground">{FORMS_COPY.loadingState}</Text> : null}
+    {isLoading ? (
+      <Text className="text-sm text-muted-foreground">{FORMS_COPY.loadingState}</Text>
+    ) : null}
     {errorMessage ? <Text className="text-sm text-red-500">{errorMessage}</Text> : null}
 
     {!isLoading && !errorMessage && forms.length === 0 ? (
@@ -49,7 +51,9 @@ const FormsScreen = ({ forms, isLoading, errorMessage, onRefresh }: FormsScreenP
             {form.description ? (
               <Text className="mt-1 text-sm text-muted-foreground">{form.description}</Text>
             ) : null}
-            <Text className="mt-2 text-xs text-muted-foreground">{buildFormMetadataLine(form)}</Text>
+            <Text className="mt-2 text-xs text-muted-foreground">
+              {buildFormMetadataLine(form)}
+            </Text>
             {form.organizationName ? (
               <Text className="mt-1 text-xs text-muted-foreground">{form.organizationName}</Text>
             ) : null}

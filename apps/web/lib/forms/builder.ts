@@ -62,7 +62,10 @@ export const slugifyFieldKey = (value: string): string =>
     .replace(EDGE_DASH_REGEX, '')
     .replace(/-/g, '_');
 
-export const buildDefaultField = (fieldType: FormFieldType, fallbackIndex: number): FormFieldDefinition => {
+export const buildDefaultField = (
+  fieldType: FormFieldType,
+  fallbackIndex: number
+): FormFieldDefinition => {
   const label = DEFAULT_FIELD_LABELS[fieldType];
   const fallbackKey = `${DEFAULT_FIELD_KEYS[fieldType]}_${fallbackIndex + 1}`;
 
@@ -165,7 +168,9 @@ export const serializeSelectOptionsInput = (
   options: Array<{ value: string; label: string }> | undefined
 ): string => (options ?? []).map((option) => option.label).join('\n');
 
-export const sanitizeBuilderPayload = (payload: FormBuilderSubmitPayload): FormBuilderSubmitPayload => {
+export const sanitizeBuilderPayload = (
+  payload: FormBuilderSubmitPayload
+): FormBuilderSubmitPayload => {
   const normalizedFields = payload.fields.map((field, index) => {
     const normalizedLabel = field.label.trim();
     const normalizedKey = slugifyFieldKey(field.key);

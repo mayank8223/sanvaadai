@@ -57,7 +57,10 @@ export const AuthenticatedShell = ({
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 md:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <Link href={HOME_PATH} className="text-lg font-semibold tracking-tight text-foreground">
+              <Link
+                href={HOME_PATH}
+                className="text-lg font-semibold tracking-tight text-foreground"
+              >
                 {APP_NAME}
               </Link>
               <span className="rounded-full border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
@@ -79,7 +82,11 @@ export const AuthenticatedShell = ({
           </div>
           <nav aria-label="Primary" className="flex flex-wrap items-center gap-4 text-sm">
             {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className="text-muted-foreground hover:text-foreground">
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 {item.label}
               </Link>
             ))}
@@ -94,7 +101,12 @@ export const AuthenticatedShell = ({
             <a href={HELP_URL} target="_blank" rel="noreferrer" className="hover:text-foreground">
               Help
             </a>
-            <a href={PRIVACY_URL} target="_blank" rel="noreferrer" className="hover:text-foreground">
+            <a
+              href={PRIVACY_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-foreground"
+            >
               Privacy
             </a>
           </div>

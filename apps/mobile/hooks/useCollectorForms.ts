@@ -65,7 +65,9 @@ const useCollectorForms = (session: Session | null) => {
 
       const { data: formsData, error: formsError } = await supabase
         .from('forms')
-        .select('id, title, description, status, updated_at, published_at, organization_id, version')
+        .select(
+          'id, title, description, status, updated_at, published_at, organization_id, version'
+        )
         .in('organization_id', organizationIds)
         .eq('status', 'PUBLISHED')
         .order('updated_at', { ascending: false });

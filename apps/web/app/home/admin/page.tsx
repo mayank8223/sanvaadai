@@ -56,25 +56,32 @@ const AdminHomePage = async () => {
   const organizationId = activeMembership.organization_id;
   const supabase = await createClient();
 
-  const [{ count: formsCount }, { count: publishedFormsCount }, { count: teamCount }, recentResult] =
-    await Promise.all([
-      supabase.from('forms').select('id', { count: 'exact', head: true }).eq('organization_id', organizationId),
-      supabase
-        .from('forms')
-        .select('id', { count: 'exact', head: true })
-        .eq('organization_id', organizationId)
-        .eq('status', 'PUBLISHED'),
-      supabase
-        .from('memberships')
-        .select('id', { count: 'exact', head: true })
-        .eq('organization_id', organizationId),
-      supabase
-        .from('submissions')
-        .select('id, submitted_at, collector_user_id, users:collector_user_id(full_name, email)')
-        .eq('organization_id', organizationId)
-        .order('submitted_at', { ascending: false })
-        .limit(5),
-    ]);
+  const [
+    { count: formsCount },
+    { count: publishedFormsCount },
+    { count: teamCount },
+    recentResult,
+  ] = await Promise.all([
+    supabase
+      .from('forms')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', organizationId),
+    supabase
+      .from('forms')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', organizationId)
+      .eq('status', 'PUBLISHED'),
+    supabase
+      .from('memberships')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', organizationId),
+    supabase
+      .from('submissions')
+      .select('id, submitted_at, collector_user_id, users:collector_user_id(full_name, email)')
+      .eq('organization_id', organizationId)
+      .order('submitted_at', { ascending: false })
+      .limit(5),
+  ]);
   return (
     <AuthenticatedShell
       userEmail={user.email ?? null}
@@ -116,16 +123,23 @@ const AdminHomePage = async () => {
             ) : (
               <ul className="space-y-2 text-sm">
                 {(recentResult.data ?? []).map((item) => (
-                  <li key={item.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
+                  <li
+                    key={item.id}
+                    className="flex items-center justify-between gap-3 rounded-md border p-3"
+                  >
                     <div>
                       <p className="font-medium text-foreground">
                         {toUserIdentity(item.users)?.full_name ?? 'Unknown collector'}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {toUserIdentity(item.users)?.email ?? item.collector_user_id ?? 'No collector'}
+                        {toUserIdentity(item.users)?.email ??
+                          item.collector_user_id ??
+                          'No collector'}
                       </p>
                     </div>
-                    <span className="text-muted-foreground">{formatDateTime(item.submitted_at)}</span>
+                    <span className="text-muted-foreground">
+                      {formatDateTime(item.submitted_at)}
+                    </span>
                   </li>
                 ))}
               </ul>

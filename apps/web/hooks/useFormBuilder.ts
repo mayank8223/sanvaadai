@@ -3,7 +3,11 @@
 /* ----------------- Globals --------------- */
 import { useCallback, useMemo, useState } from 'react';
 
-import { FORM_FIELD_TYPES, type FormFieldDefinition, type FormFieldType } from '@/lib/forms/contracts';
+import {
+  FORM_FIELD_TYPES,
+  type FormFieldDefinition,
+  type FormFieldType,
+} from '@/lib/forms/contracts';
 import {
   buildDefaultField,
   parseSelectOptionsInput,
@@ -63,20 +67,23 @@ const useFormBuilder = ({ initialForm, onComplete }: UseFormBuilderInput) => {
     setSuccessMessage(null);
   }, []);
 
-  const removeField = useCallback((fieldId: string) => {
-    setFields((currentFields) => {
-      const nextFields = currentFields.filter((field) => field.id !== fieldId);
+  const removeField = useCallback(
+    (fieldId: string) => {
+      setFields((currentFields) => {
+        const nextFields = currentFields.filter((field) => field.id !== fieldId);
 
-      if (selectedFieldId === fieldId) {
-        setSelectedFieldId(nextFields[0]?.id ?? null);
-      }
+        if (selectedFieldId === fieldId) {
+          setSelectedFieldId(nextFields[0]?.id ?? null);
+        }
 
-      return nextFields;
-    });
+        return nextFields;
+      });
 
-    setErrorMessage(null);
-    setSuccessMessage(null);
-  }, [selectedFieldId]);
+      setErrorMessage(null);
+      setSuccessMessage(null);
+    },
+    [selectedFieldId]
+  );
 
   const updateField = useCallback(({ fieldId, patch }: UpdateFieldInput) => {
     setFields((currentFields) =>

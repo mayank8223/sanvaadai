@@ -6,7 +6,11 @@ import { AuthenticatedShell } from '@/components/layout/authenticated-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { COLLECTOR_HOME_PATH, LOGIN_PATH, ONBOARDING_ORGANIZATION_PATH } from '@/lib/auth/home-routing';
+import {
+  COLLECTOR_HOME_PATH,
+  LOGIN_PATH,
+  ONBOARDING_ORGANIZATION_PATH,
+} from '@/lib/auth/home-routing';
 import { getCurrentUser } from '@/lib/auth/server';
 import { loadShellContext } from '@/lib/auth/shell';
 import {

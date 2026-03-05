@@ -24,7 +24,9 @@ const getActiveMembership = (
     return memberships[0] ?? null;
   }
 
-  return memberships.find((membership) => membership.organization_id === requestedOrganizationId) ?? null;
+  return (
+    memberships.find((membership) => membership.organization_id === requestedOrganizationId) ?? null
+  );
 };
 
 /* ----------------- Page --------------- */
