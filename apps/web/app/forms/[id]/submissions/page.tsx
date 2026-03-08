@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { SubmissionsTableClient } from '@/components/forms/submissions-table-client';
+import { ExportCsvButton } from '@/components/submissions/export-csv-button';
 import { AuthenticatedShell } from '@/components/layout/authenticated-shell';
 import { Button } from '@/components/ui/button';
 import {
@@ -97,6 +98,7 @@ const SubmissionsPage = async ({ params }: SubmissionsPageProps) => {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <ExportCsvButton formId={formId} formTitle={formData.title} />
           <Button asChild variant="outline" size="sm">
             <Link href={`/forms/${formId}/edit`}>Edit form</Link>
           </Button>

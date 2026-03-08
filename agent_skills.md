@@ -290,6 +290,8 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
   - (2026-03-08) **T22 completed:** Mobile GPS capture on submission using expo-location. See `docs/T22-mobile-gps-capture-checklist.md`.
   - (2026-03-08) **T23 completed:** Backend stores location in submission payload and computes flags (location_missing, location_poor_accuracy, location_accuracy_unknown) in metadata. Added `lib/submissions/location-flags.ts` and extended contracts. See `docs/T23-location-store-flag-checklist.md`.
   - (2026-03-08) **T24 completed:** Admin submissions table at `/forms/[id]/submissions` with TanStack Table, collector/date filters, pagination, and flag badges. See `docs/T24-submissions-table-checklist.md`.
+  - (2026-03-08) **T25 completed:** Admin submission detail view at `/submissions/[id]` with answers, metadata, and map preview (Google Maps or Mapbox static map; fallback to coordinates link). Added GET `/api/submissions/[id]`, `SubmissionDetailClient`, `SubmissionMapPreview`, and `lib/maps/constants.ts`. See `docs/T25-submission-detail-checklist.md`.
+  - (2026-03-08) **T26 completed:** CSV export of submissions via `/api/submissions/export?formId=X&format=csv`, `buildSubmissionsCsv` helper, and Export CSV button on submissions page. See `docs/T26-csv-export-checklist.md`.
 
 - **Last Updated:** 2026-03-08
 
