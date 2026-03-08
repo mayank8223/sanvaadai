@@ -1,6 +1,7 @@
 /* ----------------- Globals --------------- */
 import type {
   FormFieldDefinition,
+  GpsCoordinates,
   SubmissionAnswerValue,
   SubmissionPayload,
 } from '@sanvaadai/types';
@@ -281,10 +282,12 @@ export const validateAndBuildSubmissionAnswers = (
 export const buildSubmissionPayload = (
   formId: string,
   answers: Record<string, SubmissionAnswerValue>,
-  platform: string
+  platform: string,
+  location?: GpsCoordinates | null
 ): SubmissionPayload => ({
   form_id: formId,
   answers,
+  location: location ?? null,
   client_submitted_at: new Date().toISOString(),
   device: {
     platform,

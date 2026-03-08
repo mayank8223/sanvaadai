@@ -7,6 +7,7 @@ import useCollectorFormFlow from './hooks/useCollectorFormFlow';
 import useCollectorForms from './hooks/useCollectorForms';
 import useAuthSession from './hooks/useAuthSession';
 import useDynamicFormDraft from './hooks/useDynamicFormDraft';
+import useGpsLocation from './hooks/useGpsLocation';
 import useSubmissionQueueSync from './hooks/useSubmissionQueueSync';
 
 import './global.css';
@@ -19,6 +20,13 @@ const App = () => {
     errorMessage: formsErrorMessage,
     refreshForms,
   } = useCollectorForms(session);
+  const {
+    permissionStatus: gpsPermissionStatus,
+    isCapturing: isCapturingGps,
+    lastCoordinates: lastCapturedLocation,
+    requestPermission: requestGpsPermission,
+    captureNow: captureGpsNow,
+  } = useGpsLocation();
   const {
     hasActiveForm,
     activeFormSummary,
@@ -33,7 +41,7 @@ const App = () => {
     pendingRetryPayload,
     submitDraft,
     retryLastSubmit,
-  } = useCollectorFormFlow(session);
+  } = useCollectorFormFlow(session, captureGpsNow);
   const { queuedCount, isSyncing, flushQueue, refreshQueueCount } = useSubmissionQueueSync(session);
   const { draftAnswers, fieldErrors, setDraftValue, validate, reset } = useDynamicFormDraft(
     activeFormDefinition?.fields ?? []
@@ -99,6 +107,9 @@ const App = () => {
                   isLoading: isLoadingFormDefinition,
                   loadErrorMessage: loadFormErrorMessage,
                   isSubmitting,
+                  isCapturingGps,
+                  gpsPermissionStatus,
+                  lastCapturedLocation,
                   submitErrorMessage: submissionErrorMessage,
                   submitSuccessMessage: submissionSuccessMessage,
                   canRetry: pendingRetryPayload !== null,
@@ -106,6 +117,7 @@ const App = () => {
                   onSubmit: handleSubmitForm,
                   onRetrySubmit: handleRetrySubmit,
                   onBack: handleBackToForms,
+                  onRequestGpsPermission: requestGpsPermission,
                 }
               : null
           }

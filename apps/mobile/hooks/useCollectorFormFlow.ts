@@ -1,5 +1,5 @@
 /* ----------------- Globals --------------- */
-import type { FormDefinition, SubmissionPayload } from '@sanvaadai/types';
+import type { GpsCoordinates, FormDefinition, SubmissionPayload } from '@sanvaadai/types';
 import { type Session } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 import { useCallback, useMemo, useState } from 'react';
@@ -10,19 +10,25 @@ import { apiBaseUrl } from '../lib/api/env';
 import { fetchFormDefinition } from '../lib/api/forms';
 import { createSubmission } from '../lib/api/submissions';
 import { buildSubmissionPayload, type DraftFieldErrors } from '../lib/forms/dynamic';
+import { type GpsCaptureResult } from '../lib/location/gps';
 import { enqueueSubmission } from '../lib/offline/submission-queue';
+
+/* ----------------- Types --------------- */
+type CaptureGpsFn = () => Promise<GpsCaptureResult>;
 
 /* ----------------- Constants --------------- */
 const DEFAULT_SUBMISSION_ERROR = 'Unable to submit. Please retry.';
 
 /* ----------------- Hooks --------------- */
-const useCollectorFormFlow = (session: Session | null) => {
+const useCollectorFormFlow = (session: Session | null, captureGps?: CaptureGpsFn) => {
   const [activeFormSummary, setActiveFormSummary] = useState<CollectorFormListItem | null>(null);
   const [activeFormDefinition, setActiveFormDefinition] = useState<FormDefinition | null>(null);
   const [isLoadingFormDefinition, setIsLoadingFormDefinition] = useState<boolean>(false);
   const [loadFormErrorMessage, setLoadFormErrorMessage] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isCapturingGps, setIsCapturingGps] = useState<boolean>(false);
+  const [lastCapturedLocation, setLastCapturedLocation] = useState<GpsCoordinates | null>(null);
   const [submissionErrorMessage, setSubmissionErrorMessage] = useState<string | null>(null);
   const [submissionSuccessMessage, setSubmissionSuccessMessage] = useState<string | null>(null);
   const [pendingRetryPayload, setPendingRetryPayload] = useState<SubmissionPayload | null>(null);
@@ -72,6 +78,7 @@ const useCollectorFormFlow = (session: Session | null) => {
     setSubmissionSuccessMessage(null);
     setPendingRetryPayload(null);
     setLastSubmissionId(null);
+    setLastCapturedLocation(null);
   }, []);
 
   const submitPayload = useCallback(
@@ -140,10 +147,23 @@ const useCollectorFormFlow = (session: Session | null) => {
         return false;
       }
 
-      const payload = buildSubmissionPayload(params.formId, params.answers, Platform.OS);
+      let capturedLocation: GpsCoordinates | null = null;
+
+      if (captureGps) {
+        setIsCapturingGps(true);
+        const gpsResult = await captureGps();
+        setIsCapturingGps(false);
+
+        if (gpsResult.ok) {
+          capturedLocation = gpsResult.coordinates;
+          setLastCapturedLocation(capturedLocation);
+        }
+      }
+
+      const payload = buildSubmissionPayload(params.formId, params.answers, Platform.OS, capturedLocation);
       return submitPayload(payload, params.organizationId);
     },
-    [submitPayload]
+    [captureGps, submitPayload]
   );
 
   const retryLastSubmit = useCallback(async (): Promise<boolean> => {
@@ -168,6 +188,8 @@ const useCollectorFormFlow = (session: Session | null) => {
     openForm,
     closeForm,
     isSubmitting,
+    isCapturingGps,
+    lastCapturedLocation,
     submissionErrorMessage,
     submissionSuccessMessage,
     pendingRetryPayload,

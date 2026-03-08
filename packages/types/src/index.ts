@@ -18,6 +18,7 @@ export type {
   SelectFormFieldOption,
   FormDefinition,
   SubmissionAnswerValue,
+  GpsCoordinates,
   SubmissionPayload,
   SubmissionRecord,
 } from './forms-submissions';

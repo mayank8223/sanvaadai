@@ -1,9 +1,10 @@
 /* ----------------- Globals --------------- */
-import type { FormFieldDefinition } from '@sanvaadai/types';
+import type { FormFieldDefinition, GpsCoordinates } from '@sanvaadai/types';
 import { ScrollView, Text, View } from 'react-native';
 
 import { AppButton, AppInput } from '../../components';
-import { FORM_FILL_COPY } from '../../constants';
+import { FORM_FILL_COPY, GPS_COPY } from '../../constants';
+import type { GpsPermissionStatus } from '../../lib/location/gps';
 import type { DraftAnswers, DraftFieldErrors } from '../../lib/forms/dynamic';
 
 /* ----------------- Types --------------- */
@@ -14,6 +15,9 @@ type DynamicFormScreenProps = {
   draftAnswers: DraftAnswers;
   fieldErrors: DraftFieldErrors;
   isSubmitting: boolean;
+  isCapturingGps: boolean;
+  gpsPermissionStatus: GpsPermissionStatus;
+  lastCapturedLocation: GpsCoordinates | null;
   submitErrorMessage: string | null;
   submitSuccessMessage: string | null;
   canRetry: boolean;
@@ -21,6 +25,7 @@ type DynamicFormScreenProps = {
   onChangeField: (fieldKey: string, value: string) => void;
   onSubmit: () => Promise<void>;
   onRetrySubmit: () => Promise<void>;
+  onRequestGpsPermission: () => Promise<void>;
 };
 
 /* ----------------- Helpers --------------- */
@@ -86,6 +91,60 @@ const FieldRenderer = ({
   );
 };
 
+/* ----------------- Sub-components --------------- */
+const GpsStatusBadge = ({
+  permissionStatus,
+  isCapturing,
+  lastCapturedLocation,
+  onRequestPermission,
+}: {
+  permissionStatus: GpsPermissionStatus;
+  isCapturing: boolean;
+  lastCapturedLocation: GpsCoordinates | null;
+  onRequestPermission: () => Promise<void>;
+}) => {
+  if (isCapturing) {
+    return (
+      <View className="rounded-md bg-blue-50 px-3 py-2">
+        <Text className="text-xs text-blue-600">{GPS_COPY.capturingLabel}</Text>
+      </View>
+    );
+  }
+
+  if (lastCapturedLocation) {
+    return (
+      <View className="rounded-md bg-emerald-50 px-3 py-2">
+        <Text className="text-xs text-emerald-700">{GPS_COPY.capturedLabel}</Text>
+        <Text className="text-xs text-emerald-600">
+          {lastCapturedLocation.latitude.toFixed(5)}, {lastCapturedLocation.longitude.toFixed(5)}
+          {lastCapturedLocation.accuracy !== null
+            ? ` ±${Math.round(lastCapturedLocation.accuracy)}m`
+            : ''}
+        </Text>
+      </View>
+    );
+  }
+
+  if (permissionStatus === 'denied') {
+    return (
+      <View className="rounded-md bg-amber-50 px-3 py-2">
+        <Text className="text-xs text-amber-700">{GPS_COPY.permissionDeniedLabel}</Text>
+        <AppButton
+          label={GPS_COPY.enablePermissionLabel}
+          variant="outline"
+          size="sm"
+          className="mt-1"
+          onPress={() => {
+            void onRequestPermission();
+          }}
+        />
+      </View>
+    );
+  }
+
+  return null;
+};
+
 /* ----------------- Component --------------- */
 const DynamicFormScreen = ({
   title,
@@ -94,6 +153,9 @@ const DynamicFormScreen = ({
   draftAnswers,
   fieldErrors,
   isSubmitting,
+  isCapturingGps,
+  gpsPermissionStatus,
+  lastCapturedLocation,
   submitErrorMessage,
   submitSuccessMessage,
   canRetry,
@@ -101,6 +163,7 @@ const DynamicFormScreen = ({
   onChangeField,
   onSubmit,
   onRetrySubmit,
+  onRequestGpsPermission,
 }: DynamicFormScreenProps) => (
   <View className="w-full gap-4">
     <View className="flex-row items-center justify-between">
@@ -137,6 +200,13 @@ const DynamicFormScreen = ({
       ))}
     </ScrollView>
 
+    <GpsStatusBadge
+      permissionStatus={gpsPermissionStatus}
+      isCapturing={isCapturingGps}
+      lastCapturedLocation={lastCapturedLocation}
+      onRequestPermission={onRequestGpsPermission}
+    />
+
     {submitErrorMessage ? <Text className="text-sm text-red-500">{submitErrorMessage}</Text> : null}
     {submitSuccessMessage ? (
       <Text className="text-sm text-emerald-600">{submitSuccessMessage}</Text>
@@ -144,8 +214,8 @@ const DynamicFormScreen = ({
 
     <View className="gap-2">
       <AppButton
-        label={isSubmitting ? FORM_FILL_COPY.submittingLabel : FORM_FILL_COPY.submitLabel}
-        disabled={isSubmitting}
+        label={isSubmitting || isCapturingGps ? FORM_FILL_COPY.submittingLabel : FORM_FILL_COPY.submitLabel}
+        disabled={isSubmitting || isCapturingGps}
         onPress={() => {
           void onSubmit();
         }}
@@ -154,7 +224,7 @@ const DynamicFormScreen = ({
         <AppButton
           label={FORM_FILL_COPY.retryLabel}
           variant="outline"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isCapturingGps}
           onPress={() => {
             void onRetrySubmit();
           }}

@@ -105,9 +105,17 @@ export type SubmissionAnswerValue =
       size_bytes?: number | null;
     }[];
 
+export type GpsCoordinates = {
+  latitude: number;
+  longitude: number;
+  accuracy: number | null;
+  captured_at: string;
+};
+
 export type SubmissionPayload = {
   form_id: string;
   answers: Record<string, SubmissionAnswerValue>;
+  location?: GpsCoordinates | null;
   client_submitted_at?: string;
   device?: {
     platform?: string;

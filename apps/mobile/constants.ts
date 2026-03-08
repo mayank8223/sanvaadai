@@ -50,3 +50,13 @@ export const OFFLINE_COPY = {
   syncingQueueLabel: 'Syncing queued submissions...',
   syncQueueLabel: 'Sync now',
 } as const;
+
+export const GPS_COPY = {
+  capturingLabel: 'Capturing GPS location...',
+  capturedLabel: 'GPS location captured',
+  permissionDeniedLabel: 'Location permission denied. Submission will proceed without GPS.',
+  enablePermissionLabel: 'Enable location',
+  permissionGrantedStatus: 'Location: enabled',
+  permissionDeniedStatus: 'Location: disabled',
+  permissionUndeterminedStatus: 'Location: not set',
+} as const;

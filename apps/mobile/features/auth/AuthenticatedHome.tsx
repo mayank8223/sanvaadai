@@ -5,7 +5,8 @@ import { APP_TAGLINE, AUTH_COPY, OFFLINE_COPY } from '../../constants';
 import DynamicFormScreen from '../forms/DynamicFormScreen';
 import FormsScreen, { type FormsScreenItem } from '../forms/FormsScreen';
 import type { DraftAnswers, DraftFieldErrors } from '../../lib/forms/dynamic';
-import type { FormFieldDefinition } from '@sanvaadai/types';
+import type { GpsPermissionStatus } from '../../lib/location/gps';
+import type { FormFieldDefinition, GpsCoordinates } from '@sanvaadai/types';
 
 export type AuthenticatedHomeProps = {
   email: string;
@@ -27,6 +28,9 @@ export type AuthenticatedHomeProps = {
     isLoading: boolean;
     loadErrorMessage: string | null;
     isSubmitting: boolean;
+    isCapturingGps: boolean;
+    gpsPermissionStatus: GpsPermissionStatus;
+    lastCapturedLocation: GpsCoordinates | null;
     submitErrorMessage: string | null;
     submitSuccessMessage: string | null;
     canRetry: boolean;
@@ -34,6 +38,7 @@ export type AuthenticatedHomeProps = {
     onSubmit: () => Promise<void>;
     onRetrySubmit: () => Promise<void>;
     onBack: () => void;
+    onRequestGpsPermission: () => Promise<void>;
   } | null;
 };
 
@@ -91,6 +96,9 @@ const AuthenticatedHome = ({
             draftAnswers={activeForm.draftAnswers}
             fieldErrors={activeForm.fieldErrors}
             isSubmitting={activeForm.isSubmitting}
+            isCapturingGps={activeForm.isCapturingGps}
+            gpsPermissionStatus={activeForm.gpsPermissionStatus}
+            lastCapturedLocation={activeForm.lastCapturedLocation}
             submitErrorMessage={activeForm.submitErrorMessage}
             submitSuccessMessage={activeForm.submitSuccessMessage}
             canRetry={activeForm.canRetry}
@@ -98,6 +106,7 @@ const AuthenticatedHome = ({
             onChangeField={activeForm.onChangeField}
             onSubmit={activeForm.onSubmit}
             onRetrySubmit={activeForm.onRetrySubmit}
+            onRequestGpsPermission={activeForm.onRequestGpsPermission}
           />
         )
       ) : (
