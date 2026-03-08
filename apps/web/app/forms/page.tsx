@@ -107,7 +107,7 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
   } catch (error) {
     loadError = error instanceof Error ? error.message : 'Failed to load forms';
   }
-  console.log('activeMembership--tt', activeMembership);
+
   return (
     <AuthenticatedShell
       userEmail={user.email ?? null}
@@ -185,9 +185,16 @@ const FormsPage = async ({ searchParams }: FormsPageProps) => {
                         {getFormSubmissionCount(form)}
                       </td>
                       <td className="px-2 py-3 text-right">
-                        <Button asChild variant="outline" size="sm">
-                          <Link href={`/forms/${form.id}/edit`}>Edit</Link>
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/forms/${form.id}/submissions`}>
+                              Submissions
+                            </Link>
+                          </Button>
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/forms/${form.id}/edit`}>Edit</Link>
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}

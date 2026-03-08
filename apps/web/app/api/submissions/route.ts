@@ -3,11 +3,12 @@ import { NextResponse } from 'next/server';
 
 import { withApiGuard } from '@/lib/auth/guards';
 import { parseCreateSubmissionInput, parseListSubmissionsQuery } from '@/lib/submissions/contracts';
+import { computeLocationFlags } from '@/lib/submissions/location-flags';
 import { createClient } from '@/lib/supabase/server';
 
 /* ----------------- Constants --------------- */
 const SUBMISSION_SELECT_COLUMNS =
-  'id, organization_id, form_id, collector_user_id, payload, metadata, submitted_at, created_at, updated_at';
+  'id, organization_id, form_id, collector_user_id, payload, metadata, submitted_at, created_at, updated_at, users:collector_user_id(full_name, email)';
 
 /* ----------------- Helpers --------------- */
 const getFormForOrganization = async (formId: string, organizationId: string) => {
@@ -87,8 +88,29 @@ export const GET = withApiGuard(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    const submissions = (data ?? []).map((row: Record<string, unknown>) => {
+      const metadata = (row.metadata as Record<string, unknown>) ?? {};
+      const payload = (row.payload as Record<string, unknown>) ?? {};
+      let flags = metadata.flags as Record<string, boolean> | undefined;
+      if (!flags && payload.location) {
+        flags = computeLocationFlags(payload.location as Parameters<typeof computeLocationFlags>[0]);
+      }
+      if (!flags) {
+        flags = computeLocationFlags(null);
+      }
+      const users = row.users as { full_name: string | null; email: string | null } | null;
+      return {
+        ...row,
+        collector: users
+          ? { full_name: users.full_name ?? null, email: users.email ?? null }
+          : null,
+        flags,
+        users: undefined,
+      };
+    });
+
     return NextResponse.json({
-      submissions: data ?? [],
+      submissions,
       pagination: {
         limit: parsedQuery.limit,
         offset: parsedQuery.offset,
@@ -120,7 +142,7 @@ export const POST = withApiGuard(async ({ request, context }) => {
     return NextResponse.json(
       {
         error:
-          'Invalid body. Expected { form_id: string, answers: Record<string, unknown>, client_submitted_at?: string, device?: { platform?: string, app_version?: string } }',
+          'Invalid body. Expected { form_id: string, answers: Record<string, unknown>, location?: { latitude, longitude, accuracy? } | null, client_submitted_at?: string, device?: { platform?: string, app_version?: string } }',
       },
       { status: 400 }
     );
@@ -146,6 +168,7 @@ export const POST = withApiGuard(async ({ request, context }) => {
   }
 
   const nowIso = new Date().toISOString();
+  const locationFlags = computeLocationFlags(parsedInput.location);
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('submissions')
@@ -158,6 +181,7 @@ export const POST = withApiGuard(async ({ request, context }) => {
         source: 'api',
         membership_role: activeMembership.role,
         received_at: nowIso,
+        flags: locationFlags,
       },
       submitted_at: parsedInput.client_submitted_at ?? nowIso,
     })

@@ -287,8 +287,11 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
   - (2026-03-07) **T19 completed:** Added mobile dynamic form renderer with API-loaded `FormDefinition`, reusable draft/validation helpers, and typed field rendering for `text`, `number`, `date`, `select`, `file`, and `location`. Added `useCollectorFormFlow` + `useDynamicFormDraft`, integrated in authenticated mobile home, and added helper tests in `apps/mobile/lib/forms/dynamic.test.ts`. See `docs/T19-mobile-dynamic-form-renderer-checklist.md`.
   - (2026-03-07) **T20 completed:** Wired mobile form submit flow to `POST /api/submissions` with success/error handling and retry of last failed payload. Added mobile API env + clients, payload builder integration, and bearer-token auth resolution in web API guards so mobile can call protected endpoints with `Authorization` header and `x-organization-id`. See `docs/T20-mobile-submit-responses-checklist.md`.
   - (2026-03-07) **T21 completed:** Added offline-first mobile behavior with local forms cache (AsyncStorage), persisted submission queue, and auto-sync on reconnect/interval using NetInfo. Updated collector flows to use cached forms when network fetch fails and enqueue retryable submission failures for later sync; added queue sync UI and offline tests in `apps/mobile/lib/offline/*.test.ts`. See `docs/T21-mobile-offline-caching-and-queue-checklist.md`.
+  - (2026-03-08) **T22 completed:** Mobile GPS capture on submission using expo-location. See `docs/T22-mobile-gps-capture-checklist.md`.
+  - (2026-03-08) **T23 completed:** Backend stores location in submission payload and computes flags (location_missing, location_poor_accuracy, location_accuracy_unknown) in metadata. Added `lib/submissions/location-flags.ts` and extended contracts. See `docs/T23-location-store-flag-checklist.md`.
+  - (2026-03-08) **T24 completed:** Admin submissions table at `/forms/[id]/submissions` with TanStack Table, collector/date filters, pagination, and flag badges. See `docs/T24-submissions-table-checklist.md`.
 
-- **Last Updated:** 2026-03-07
+- **Last Updated:** 2026-03-08
 
 ---
 

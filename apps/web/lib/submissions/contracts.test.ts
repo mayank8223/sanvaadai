@@ -49,6 +49,50 @@ describe('parseCreateSubmissionInput', () => {
       })
     ).toBeNull();
   });
+
+  it('parses location when provided', () => {
+    const parsed = parseCreateSubmissionInput({
+      form_id: 'form_1',
+      answers: {},
+      location: {
+        latitude: 12.34,
+        longitude: 56.78,
+        accuracy: 15,
+        captured_at: '2026-03-07T10:00:00.000Z',
+      },
+    });
+
+    expect(parsed?.location).toEqual({
+      latitude: 12.34,
+      longitude: 56.78,
+      accuracy: 15,
+      captured_at: '2026-03-07T10:00:00.000Z',
+    });
+  });
+
+  it('accepts location with null accuracy', () => {
+    const parsed = parseCreateSubmissionInput({
+      form_id: 'form_1',
+      answers: {},
+      location: { latitude: 12.34, longitude: 56.78, accuracy: null },
+    });
+
+    expect(parsed?.location).toEqual({
+      latitude: 12.34,
+      longitude: 56.78,
+      accuracy: null,
+    });
+  });
+
+  it('accepts explicit location: null', () => {
+    const parsed = parseCreateSubmissionInput({
+      form_id: 'form_1',
+      answers: {},
+      location: null,
+    });
+
+    expect(parsed?.location).toBeNull();
+  });
 });
 
 describe('parseListSubmissionsQuery', () => {

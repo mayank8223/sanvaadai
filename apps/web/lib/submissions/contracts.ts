@@ -3,9 +3,17 @@ const DEFAULT_LIST_LIMIT = 50;
 const MAX_LIST_LIMIT = 100;
 
 /* ----------------- Types --------------- */
+export type GpsCoordinatesInput = {
+  latitude: number;
+  longitude: number;
+  accuracy: number | null;
+  captured_at?: string;
+};
+
 export type CreateSubmissionInput = {
   form_id: string;
   answers: Record<string, unknown>;
+  location?: GpsCoordinatesInput | null;
   client_submitted_at?: string;
   device?: {
     platform?: string;
@@ -53,6 +61,33 @@ const parsePositiveInteger = (value: string | null): number | null => {
   return parsedValue;
 };
 
+const parseNumber = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isFinite(value) && !Number.isNaN(value)) return value;
+  return null;
+};
+
+const parseGpsCoordinates = (value: unknown): GpsCoordinatesInput | null => {
+  if (!isObjectRecord(value)) return null;
+
+  const latitude = parseNumber(value.latitude);
+  const longitude = parseNumber(value.longitude);
+  if (latitude === null || longitude === null) return null;
+
+  const accuracy = value.accuracy === undefined || value.accuracy === null
+    ? null
+    : parseNumber(value.accuracy);
+  if (value.accuracy !== undefined && value.accuracy !== null && accuracy === null) return null;
+
+  const capturedAt = parseIsoDateTimeString(value.captured_at) ?? parseString(value.captured_at);
+
+  return {
+    latitude,
+    longitude,
+    accuracy,
+    ...(capturedAt && { captured_at: capturedAt }),
+  };
+};
+
 /* ----------------- Parsers --------------- */
 export const parseCreateSubmissionInput = (value: unknown): CreateSubmissionInput | null => {
   if (!isObjectRecord(value)) return null;
@@ -66,6 +101,15 @@ export const parseCreateSubmissionInput = (value: unknown): CreateSubmissionInpu
     form_id: formId,
     answers: value.answers,
   };
+
+  if (Object.prototype.hasOwnProperty.call(value, 'location')) {
+    if (value.location === null || value.location === undefined) {
+      parsedInput.location = null;
+    } else {
+      const location = parseGpsCoordinates(value.location);
+      if (location) parsedInput.location = location;
+    }
+  }
 
   if (Object.prototype.hasOwnProperty.call(value, 'client_submitted_at')) {
     const submittedAt = parseIsoDateTimeString(value.client_submitted_at);
