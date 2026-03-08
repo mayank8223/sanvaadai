@@ -2,8 +2,10 @@
 import { type Session } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { OFFLINE_COPY } from '../constants';
 import { supabase } from '../lib/supabase/client';
 import { type CollectorFormRecord } from '../lib/forms/helpers';
+import { readCachedForms, saveCachedForms } from '../lib/offline/forms-cache';
 
 /* ----------------- Types --------------- */
 type MembershipRecord = {
@@ -24,6 +26,7 @@ const useCollectorForms = (session: Session | null) => {
     if (!session?.user.id) {
       setForms([]);
       setIsLoading(false);
+      setErrorMessage(null);
       return;
     }
 
@@ -77,23 +80,45 @@ const useCollectorForms = (session: Session | null) => {
       }
 
       const formRows = (formsData ?? []) as CollectorFormRecord[];
-      setForms(
-        formRows.map((formRow) => ({
-          ...formRow,
-          organizationName: organizationNameById.get(formRow.organization_id) ?? null,
-        }))
-      );
+      const resolvedForms = formRows.map((formRow) => ({
+        ...formRow,
+        organizationName: organizationNameById.get(formRow.organization_id) ?? null,
+      }));
+
+      setForms(resolvedForms);
+      await saveCachedForms(resolvedForms);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to load forms.');
-      setForms([]);
+      const cachedForms = await readCachedForms();
+      if (cachedForms && cachedForms.length > 0) {
+        setForms(cachedForms);
+        setErrorMessage(OFFLINE_COPY.usingCachedFormsMessage);
+      } else {
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to load forms.');
+        setForms([]);
+      }
     } finally {
       setIsLoading(false);
     }
   }, [session?.user.id]);
 
+  const warmCachedForms = useCallback(async () => {
+    const cachedForms = await readCachedForms();
+    if (cachedForms && cachedForms.length > 0) {
+      setForms(cachedForms);
+    }
+  }, []);
+
   useEffect(() => {
+    void warmCachedForms();
+  }, [warmCachedForms]);
+
+  useEffect(() => {
+    if (!session?.user.id) {
+      return;
+    }
+
     void loadForms();
-  }, [loadForms]);
+  }, [loadForms, session?.user.id]);
 
   const formCount = useMemo<number>(() => forms.length, [forms]);
 

@@ -15,10 +15,11 @@ export type FormsScreenProps = {
   isLoading: boolean;
   errorMessage: string | null;
   onRefresh: () => Promise<void>;
+  onOpenForm: (form: FormsScreenItem) => void;
 };
 
 /* ----------------- Component --------------- */
-const FormsScreen = ({ forms, isLoading, errorMessage, onRefresh }: FormsScreenProps) => (
+const FormsScreen = ({ forms, isLoading, errorMessage, onRefresh, onOpenForm }: FormsScreenProps) => (
   <View className="w-full gap-3">
     <View className="flex-row items-center justify-between">
       <View>
@@ -57,6 +58,15 @@ const FormsScreen = ({ forms, isLoading, errorMessage, onRefresh }: FormsScreenP
             {form.organizationName ? (
               <Text className="mt-1 text-xs text-muted-foreground">{form.organizationName}</Text>
             ) : null}
+            <View className="mt-3">
+              <AppButton
+                size="sm"
+                label={FORMS_COPY.openFormLabel}
+                onPress={() => {
+                  onOpenForm(form);
+                }}
+              />
+            </View>
           </View>
         ))}
       </View>

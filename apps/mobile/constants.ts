@@ -26,4 +26,27 @@ export const FORMS_COPY = {
   emptyState: 'No published forms are available right now.',
   loadingState: 'Loading forms...',
   refreshLabel: 'Refresh forms',
+  openFormLabel: 'Open form',
+} as const;
+
+export const FORM_FILL_COPY = {
+  title: 'Fill form',
+  backLabel: 'Back to list',
+  submitLabel: 'Submit response',
+  submittingLabel: 'Submitting...',
+  retryLabel: 'Retry last submit',
+  textPlaceholder: 'Enter text',
+  numberPlaceholder: 'Enter number',
+  datePlaceholder: 'YYYY-MM-DD',
+  selectPlaceholder: 'Choose an option',
+  filePlaceholder: 'Enter uploaded file path',
+  locationPlaceholder: 'lat,long,accuracy',
+} as const;
+
+export const OFFLINE_COPY = {
+  usingCachedFormsMessage: 'Showing cached forms while connection is unavailable.',
+  queuedSubmissionLabel: 'Submission queued for sync.',
+  queuedSummaryLabel: 'Queued submissions',
+  syncingQueueLabel: 'Syncing queued submissions...',
+  syncQueueLabel: 'Sync now',
 } as const;

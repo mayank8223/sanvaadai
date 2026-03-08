@@ -1,7 +1,7 @@
 /* ----------------- Globals --------------- */
 import { NextResponse } from 'next/server';
 
-import { getCurrentUser } from '@/lib/auth/server';
+import { getCurrentUserFromRequest } from '@/lib/auth/server';
 import { createClient } from '@/lib/supabase/server';
 
 import {
@@ -81,9 +81,9 @@ export const withApiGuard = (handler: GuardedApiHandler, options: ApiGuardOption
   const resolvedOptions = mergeGuardOptions(options);
 
   return async (request: Request) => {
-    const user = await getCurrentUser();
+    const { user, source } = await getCurrentUserFromRequest(request);
 
-    if (user) {
+    if (user && source === 'cookie') {
       try {
         const supabase = await createClient();
         await syncUserProfile(supabase, user);
