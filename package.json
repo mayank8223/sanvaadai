@@ -22,5 +22,9 @@
   "packageManager": "bun@1.0.0",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.41",
+    "ai": "^6.0.116"
   }
 }

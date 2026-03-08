@@ -292,6 +292,8 @@ When you (or an automated process) revise a skill, update **Improvement Notes** 
   - (2026-03-08) **T24 completed:** Admin submissions table at `/forms/[id]/submissions` with TanStack Table, collector/date filters, pagination, and flag badges. See `docs/T24-submissions-table-checklist.md`.
   - (2026-03-08) **T25 completed:** Admin submission detail view at `/submissions/[id]` with answers, metadata, and map preview (Google Maps or Mapbox static map; fallback to coordinates link). Added GET `/api/submissions/[id]`, `SubmissionDetailClient`, `SubmissionMapPreview`, and `lib/maps/constants.ts`. See `docs/T25-submission-detail-checklist.md`.
   - (2026-03-08) **T26 completed:** CSV export of submissions via `/api/submissions/export?formId=X&format=csv`, `buildSubmissionsCsv` helper, and Export CSV button on submissions page. See `docs/T26-csv-export-checklist.md`.
+  - (2026-03-08) **T27 completed:** Vercel AI SDK (`ai`, `@ai-sdk/openai`) integrated in web app. Added `lib/ai/provider.ts` (chatModel, transcriptionModel), `lib/ai/constants.ts`, and `GET /api/ai/test` verification route. Uses `OPENAI_API_KEY` from env. See `docs/T27-ai-sdk-checklist.md`.
+  - (2026-03-08) **T28 completed:** Speech-to-text endpoint at `POST /api/transcribe` using AI SDK `experimental_transcribe` + OpenAI Whisper. Accepts multipart `audio` file, optional `language` (ISO-639-1), returns `{ text, language?, durationInSeconds?, segments? }`. Auth required (web + mobile). Added `lib/ai/transcribe.ts` with validation and unit tests. See `docs/T28-speech-to-text-checklist.md`.
 
 - **Last Updated:** 2026-03-08
 
