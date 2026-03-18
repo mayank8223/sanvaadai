@@ -174,5 +174,3 @@ export const LoginPageContent = () => (
     </main>
   </div>
 );
-
-export default LoginForm;

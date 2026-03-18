@@ -1,4 +1,5 @@
 /* ----------------- Globals --------------- */
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -19,7 +20,13 @@ import {
   type FormsListFormRecord,
   type FormsListSearchParams,
 } from '@/lib/forms/listing';
+import { APP_NAME } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
+
+/* ----------------- Metadata --------------- */
+export const metadata: Metadata = {
+  title: `Forms | ${APP_NAME}`,
+};
 
 /* ----------------- Constants --------------- */
 const FORMS_PATH = '/forms';
@@ -38,14 +45,14 @@ const formatIsoDate = (value: string): string =>
 
 const getStatusBadgeClassName = (status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') => {
   if (status === 'PUBLISHED') {
-    return 'bg-green-500 text-green-800 dark:bg-green-500 dark:text-green-200';
+    return 'bg-primary/15 text-primary';
   }
 
   if (status === 'ARCHIVED') {
-    return 'bg-gray-500 text-gray-800 dark:bg-gray-500 dark:text-gray-200';
+    return 'bg-muted text-muted-foreground';
   }
 
-  return 'bg-yellow-500 text-yellow-800 dark:bg-yellow-500 dark:text-yellow-200';
+  return 'bg-accent text-accent-foreground';
 };
 
 const getFilterHref = (status: (typeof STATUS_FILTER_OPTIONS)[number]) =>

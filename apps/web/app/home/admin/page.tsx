@@ -1,4 +1,5 @@
 /* ----------------- Globals --------------- */
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -14,14 +15,14 @@ import {
 } from '@/lib/auth/home-routing';
 import { getCurrentUser } from '@/lib/auth/server';
 import { loadShellContext } from '@/lib/auth/shell';
+import { formatDateTime } from '@/lib/formatters';
+import { APP_NAME } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 
-/* ----------------- Helpers --------------- */
-const formatDateTime = (isoDate: string): string =>
-  new Intl.DateTimeFormat('en-IN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(isoDate));
+/* ----------------- Metadata --------------- */
+export const metadata: Metadata = {
+  title: `Dashboard | ${APP_NAME}`,
+};
 
 const toUserIdentity = (
   users:
