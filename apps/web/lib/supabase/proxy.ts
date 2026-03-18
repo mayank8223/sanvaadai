@@ -20,9 +20,10 @@ type ServerClientOptions = SupabaseClientOptions<'public'> & {
   cookieEncoding?: 'raw' | 'base64url';
 };
 
-const PUBLIC_PATH_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/api/health'];
+const PUBLIC_PATH_PREFIXES = ['/login', '/signup', '/auth', '/invite', '/api/health', '/about', '/privacy'];
 
 const isPublicPath = (pathname: string): boolean =>
+  pathname === '/' ||
   PUBLIC_PATH_PREFIXES.some((publicPathPrefix) => pathname.startsWith(publicPathPrefix));
 
 /**
