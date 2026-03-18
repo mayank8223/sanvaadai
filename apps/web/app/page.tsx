@@ -1,22 +1,30 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { LandingPage } from '@/components/landing/landing-page';
 import { AuthenticatedShell } from '@/components/layout/authenticated-shell';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   HOME_PATH,
-  LOGIN_PATH,
   ONBOARDING_ORGANIZATION_PATH,
   resolveHomeRouteDecision,
 } from '@/lib/auth/home-routing';
 import { getCurrentUser } from '@/lib/auth/server';
 import { loadShellContext } from '@/lib/auth/shell';
 
+export const metadata: Metadata = {
+  title: 'Sanvaadai - AI-Powered Field Data Collection',
+  description:
+    'Create smart forms with AI, collect data offline, and analyze results. The modern platform for field research and data collection.',
+};
+
 const HomePage = async () => {
   const user = await getCurrentUser();
+
   if (!user) {
-    redirect(`${LOGIN_PATH}?next=${encodeURIComponent(HOME_PATH)}`);
+    return <LandingPage />;
   }
 
   const shellContext = await loadShellContext(user.id);

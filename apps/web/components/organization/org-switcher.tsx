@@ -4,7 +4,15 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 /* ----------------- Types --------------- */
 export type OrganizationOption = {
@@ -63,26 +71,42 @@ export const OrgSwitcher = ({ memberships, activeOrganizationId }: OrgSwitcherPr
     return null;
   }
 
+  const selectedMembership = memberships.find(
+    (m) => m.organization_id === selectedOrganizationId
+  );
+
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="org-switcher" className="sr-only">
-        Active organization
-      </label>
-      <select
-        id="org-switcher"
-        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+      <Select
         value={selectedOrganizationId}
-        onChange={(event) => setSelectedOrganizationId(event.target.value)}
+        onValueChange={setSelectedOrganizationId}
         disabled={isSaving}
       >
-        {memberships.map((membership) => (
-          <option key={membership.organization_id} value={membership.organization_id}>
-            {membership.organization?.name ?? membership.organization_id}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger className="w-[200px] bg-background" aria-label="Active organization">
+          <SelectValue>
+            {selectedMembership?.organization?.name ?? selectedOrganizationId}
+            {selectedMembership && (
+              <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">
+                {selectedMembership.role}
+              </Badge>
+            )}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {memberships.map((membership) => (
+            <SelectItem key={membership.organization_id} value={membership.organization_id}>
+              <span className="flex items-center gap-2">
+                {membership.organization?.name ?? membership.organization_id}
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                  {membership.role}
+                </Badge>
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Button type="button" size="sm" variant="outline" onClick={handleApply} disabled={isSaving}>
-        {isSaving ? 'Switching…' : 'Switch'}
+        {isSaving ? 'Switching...' : 'Switch'}
       </Button>
       {error && (
         <span className="text-xs text-destructive" role="alert">

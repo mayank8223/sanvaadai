@@ -3,19 +3,15 @@
 /* ----------------- Globals --------------- */
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  CalendarDaysIcon,
-  HashIcon,
-  ListChecksIcon,
-  MapPinIcon,
-  PaperclipIcon,
-  TypeIcon,
-  type LucideIcon,
-} from 'lucide-react';
+import { useState } from 'react';
+import { SparklesIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FieldTypeIcon } from '@/components/forms/field-type-icon';
+import FormBuilderAiPanel from '@/components/forms/form-builder-ai-panel';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import useFormBuilder from '@/hooks/useFormBuilder';
 import { FORM_FIELD_TYPES } from '@/lib/forms/contracts';
 import { type BuilderFormRecord } from '@/lib/forms/builder';
@@ -36,21 +32,13 @@ const FIELD_TYPE_LABELS: Record<(typeof FORM_FIELD_TYPES)[number], string> = {
   file: 'File',
   location: 'Location',
 };
-const FIELD_TYPE_ICONS: Record<(typeof FORM_FIELD_TYPES)[number], LucideIcon> = {
-  text: TypeIcon,
-  number: HashIcon,
-  date: CalendarDaysIcon,
-  select: ListChecksIcon,
-  file: PaperclipIcon,
-  location: MapPinIcon,
-};
-
 const getNumericInputValue = (value: unknown): string | number =>
   typeof value === 'number' ? value : '';
 
 /* ----------------- Component --------------- */
 const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
   const router = useRouter();
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
   const {
     title,
     description,
@@ -69,6 +57,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
     updateField,
     moveField,
     submitForm,
+    applyFormDraft,
   } = useFormBuilder({
     initialForm,
     onComplete: () => {
@@ -88,6 +77,15 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsAiPanelOpen(true)}
+            aria-label="Open AI assistant"
+          >
+            <SparklesIcon className="size-4" />
+            AI assistant
+          </Button>
           <Button asChild variant="outline">
             <Link href={STATUS_BACK_PATH}>Back to forms</Link>
           </Button>
@@ -105,12 +103,12 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
       </header>
 
       {(errorMessage || successMessage) && (
-        <Card className={errorMessage ? 'border-destructive/50' : 'border-green-500'}>
+        <Card className={errorMessage ? 'border-destructive/50' : 'border-primary/50'}>
           <CardContent className="pt-6">
             {errorMessage ? (
               <p className="text-sm text-destructive">{errorMessage}</p>
             ) : (
-              <p className="text-sm text-green-500">{successMessage}</p>
+              <p className="text-sm text-primary">{successMessage}</p>
             )}
           </CardContent>
         </Card>
@@ -123,23 +121,18 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
             <CardDescription>Add fields to this form definition.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {FORM_FIELD_TYPES.map((fieldType) =>
-              (() => {
-                const FieldTypeIcon = FIELD_TYPE_ICONS[fieldType];
-                return (
-                  <Button
-                    key={fieldType}
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => addField(fieldType)}
-                  >
-                    <FieldTypeIcon />
-                    {FIELD_TYPE_LABELS[fieldType]}
-                  </Button>
-                );
-              })()
-            )}
+            {FORM_FIELD_TYPES.map((fieldType) => (
+              <Button
+                key={fieldType}
+                type="button"
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => addField(fieldType)}
+              >
+                <FieldTypeIcon type={fieldType} />
+                {FIELD_TYPE_LABELS[fieldType]}
+              </Button>
+            ))}
           </CardContent>
         </Card>
 
@@ -165,11 +158,10 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
               <label htmlFor="form-description" className="text-sm font-medium text-foreground">
                 Description
               </label>
-              <textarea
+              <Textarea
                 id="form-description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 placeholder="Optional context for collectors."
               />
             </div>
@@ -177,45 +169,35 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
             <div className="space-y-2">
               <p className="text-sm font-medium text-foreground">Fields ({fields.length})</p>
               <div className="max-h-64 space-y-2 overflow-auto pr-1">
-                {fields.map((field, index) =>
-                  (() => {
-                    const FieldTypeIcon = FIELD_TYPE_ICONS[field.type];
-                    return (
-                      <button
-                        key={field.id}
-                        type="button"
-                        className={`w-full rounded-md border px-3 py-2 text-left text-sm ${
-                          selectedFieldId === field.id
-                            ? 'border-primary bg-primary/5 text-foreground'
-                            : 'border-border text-muted-foreground'
-                        }`}
-                        onClick={() => setSelectedFieldId(field.id)}
-                      >
-                        <span className="flex items-center gap-2 font-medium text-foreground">
-                          <FieldTypeIcon className="size-4 text-muted-foreground" />
-                          {field.label || `Field ${index + 1}`}
-                        </span>
-                        <span className="ml-6 text-xs uppercase text-muted-foreground">
-                          {field.type}
-                        </span>
-                      </button>
-                    );
-                  })()
-                )}
+                {fields.map((field, index) => (
+                  <button
+                    key={field.id}
+                    type="button"
+                    className={`w-full rounded-md border px-3 py-2 text-left text-sm ${
+                      selectedFieldId === field.id
+                        ? 'border-primary bg-primary/5 text-foreground'
+                        : 'border-border text-muted-foreground'
+                    }`}
+                    onClick={() => setSelectedFieldId(field.id)}
+                  >
+                    <span className="flex items-center gap-2 font-medium text-foreground">
+                      <FieldTypeIcon type={field.type} className="text-muted-foreground" />
+                      {field.label || `Field ${index + 1}`}
+                    </span>
+                    <span className="ml-6 text-xs uppercase text-muted-foreground">
+                      {field.type}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
 
             {selectedField && (
               <div className="space-y-3 rounded-md border border-border p-3">
-                {(() => {
-                  const SelectedFieldTypeIcon = FIELD_TYPE_ICONS[selectedField.type];
-                  return (
-                    <p className="flex items-center gap-2 text-sm font-medium">
-                      <SelectedFieldTypeIcon className="size-4 text-muted-foreground" />
-                      Selected field configuration
-                    </p>
-                  );
-                })()}
+                <p className="flex items-center gap-2 text-sm font-medium">
+                  <FieldTypeIcon type={selectedField.type} className="text-muted-foreground" />
+                  Selected field configuration
+                </p>
 
                 <Input
                   value={selectedField.label}
@@ -233,7 +215,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                   placeholder="field_key"
                 />
 
-                <textarea
+                <Textarea
                   value={selectedField.help_text ?? ''}
                   onChange={(event) =>
                     updateField({
@@ -241,7 +223,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                       patch: { help_text: event.target.value },
                     })
                   }
-                  className="min-h-16 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="min-h-16"
                   placeholder="Optional helper text"
                 />
 
@@ -260,7 +242,7 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                 </label>
 
                 {selectedField.type === 'select' && (
-                  <textarea
+                  <Textarea
                     value={selectedFieldOptionsInput}
                     onChange={(event) =>
                       updateField({
@@ -268,7 +250,6 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
                         patch: { optionsInput: event.target.value },
                       })
                     }
-                    className="min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     placeholder={'One option per line\nBreakfast\nLunch'}
                   />
                 )}
@@ -369,33 +350,34 @@ const FormBuilderScreen = ({ mode, initialForm }: FormBuilderScreenProps) => {
               </p>
             ) : (
               <div className="space-y-3">
-                {fields.map((field) =>
-                  (() => {
-                    const FieldTypeIcon = FIELD_TYPE_ICONS[field.type];
-                    return (
-                      <div key={field.id} className="rounded-md border border-border p-3">
-                        <p className="flex items-center gap-2 text-sm font-medium">
-                          <FieldTypeIcon className="size-4 text-muted-foreground" />
-                          {field.label}{' '}
-                          {field.required ? (
-                            <span className="text-xs text-destructive">*</span>
-                          ) : null}
-                        </p>
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                          {field.type}
-                        </p>
-                        {field.help_text && (
-                          <p className="text-xs text-muted-foreground">{field.help_text}</p>
-                        )}
-                      </div>
-                    );
-                  })()
-                )}
+                {fields.map((field) => (
+                  <div key={field.id} className="rounded-md border border-border p-3">
+                    <p className="flex items-center gap-2 text-sm font-medium">
+                      <FieldTypeIcon type={field.type} className="text-muted-foreground" />
+                      {field.label}{' '}
+                      {field.required ? (
+                        <span className="text-xs text-destructive">*</span>
+                      ) : null}
+                    </p>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {field.type}
+                    </p>
+                    {field.help_text && (
+                      <p className="text-xs text-muted-foreground">{field.help_text}</p>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>
         </Card>
       </section>
+
+      <FormBuilderAiPanel
+        isOpen={isAiPanelOpen}
+        onClose={() => setIsAiPanelOpen(false)}
+        onApplyForm={applyFormDraft}
+      />
     </main>
   );
 };

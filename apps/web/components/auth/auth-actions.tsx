@@ -2,8 +2,17 @@
 
 /* ----------------- Globals --------------- */
 import { useRouter } from 'next/navigation';
+import { LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { createClient } from '@/lib/supabase/client';
 
 const LOGIN_PATH = '/login';
@@ -28,19 +37,27 @@ export const AuthActions = ({ userEmail }: AuthActionsProps) => {
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm text-muted-foreground" aria-label="Signed in as">
-        {userEmail}
-      </span>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleSignOut}
-        type="button"
-        aria-label="Sign out"
-      >
-        Sign out
-      </Button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="User menu">
+          <UserIcon className="size-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="font-normal">
+          <span className="block truncate text-sm font-medium">{userEmail}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push('/settings')}>
+          <SettingsIcon />
+          Settings
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onClick={() => void handleSignOut()}>
+          <LogOutIcon />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

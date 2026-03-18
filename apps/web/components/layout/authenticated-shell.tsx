@@ -2,8 +2,9 @@
 import Link from 'next/link';
 
 import { AuthActions } from '@/components/auth/auth-actions';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { OrgSwitcher } from '@/components/organization/org-switcher';
-import { APP_NAME, APP_VERSION, HELP_URL, PRIVACY_URL } from '@/lib/constants';
+import { APP_NAME, APP_VERSION, PRIVACY_URL } from '@/lib/constants';
 import {
   ADMIN_HOME_PATH,
   COLLECTOR_HOME_PATH,
@@ -98,6 +99,7 @@ export const AuthenticatedShell = ({
                 memberships={memberships}
                 activeOrganizationId={activeMembership?.organization_id ?? null}
               />
+              <ThemeToggle />
               <AuthActions userEmail={userEmail ?? 'Signed in'} />
             </div>
           </div>
@@ -127,9 +129,6 @@ export const AuthenticatedShell = ({
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 text-sm text-muted-foreground md:px-6">
           <span>{APP_VERSION}</span>
           <div className="flex items-center gap-4">
-            <a href={HELP_URL} target="_blank" rel="noreferrer" className="hover:text-foreground">
-              Help
-            </a>
             <a
               href={PRIVACY_URL}
               target="_blank"

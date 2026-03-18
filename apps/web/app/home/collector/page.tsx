@@ -1,4 +1,5 @@
 /* ----------------- Globals --------------- */
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -14,14 +15,14 @@ import {
 } from '@/lib/auth/home-routing';
 import { getCurrentUser } from '@/lib/auth/server';
 import { loadShellContext } from '@/lib/auth/shell';
+import { formatDateTime } from '@/lib/formatters';
+import { APP_NAME } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 
-/* ----------------- Helpers --------------- */
-const formatDateTime = (isoDate: string): string =>
-  new Intl.DateTimeFormat('en-IN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(isoDate));
+/* ----------------- Metadata --------------- */
+export const metadata: Metadata = {
+  title: `Home | ${APP_NAME}`,
+};
 
 /* ----------------- Page --------------- */
 const CollectorHomePage = async () => {
@@ -94,7 +95,12 @@ const CollectorHomePage = async () => {
               <ul className="space-y-2 text-sm">
                 {(formsResult.data ?? []).map((form) => (
                   <li key={form.id} className="rounded-md border p-3">
-                    <p className="font-medium text-foreground">{form.title}</p>
+                    <Link
+                      href={`/collector/forms/${form.id}`}
+                      className="block font-medium text-foreground hover:underline"
+                    >
+                      {form.title}
+                    </Link>
                     <p className="text-xs text-muted-foreground">{form.status}</p>
                   </li>
                 ))}

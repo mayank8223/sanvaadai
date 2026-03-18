@@ -1,6 +1,26 @@
+/* ----------------- Globals --------------- */
+import {
+  CalendarDaysIcon,
+  HashIcon,
+  ListChecksIcon,
+  MapPinIcon,
+  PaperclipIcon,
+  TypeIcon,
+  type LucideIcon,
+} from 'lucide-react';
+
 /* ----------------- Constants --------------- */
 export const FORM_STATUSES = ['DRAFT', 'PUBLISHED', 'ARCHIVED'] as const;
 export const FORM_FIELD_TYPES = ['text', 'number', 'date', 'select', 'file', 'location'] as const;
+
+export const FIELD_TYPE_ICONS: Record<(typeof FORM_FIELD_TYPES)[number], LucideIcon> = {
+  text: TypeIcon,
+  number: HashIcon,
+  date: CalendarDaysIcon,
+  select: ListChecksIcon,
+  file: PaperclipIcon,
+  location: MapPinIcon,
+};
 
 /* ----------------- Types --------------- */
 export type FormStatus = (typeof FORM_STATUSES)[number];

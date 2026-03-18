@@ -16,6 +16,7 @@ import {
   slugifyFieldKey,
   type BuilderFormRecord,
   type BuilderSubmitTarget,
+  type FormBuilderSubmitPayload,
   validateBuilderPayload,
 } from '@/lib/forms/builder';
 
@@ -236,6 +237,15 @@ const useFormBuilder = ({ initialForm, onComplete }: UseFormBuilderInput) => {
     return serializeSelectOptionsInput(options);
   }, [selectedField]);
 
+  const applyFormDraft = useCallback((payload: FormBuilderSubmitPayload) => {
+    setTitle(payload.title);
+    setDescription(payload.description ?? '');
+    setFields(payload.fields);
+    setSelectedFieldId(payload.fields[0]?.id ?? null);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+  }, []);
+
   return {
     title,
     description,
@@ -254,6 +264,7 @@ const useFormBuilder = ({ initialForm, onComplete }: UseFormBuilderInput) => {
     updateField,
     moveField,
     submitForm,
+    applyFormDraft,
   };
 };
 

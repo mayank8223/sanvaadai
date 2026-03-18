@@ -3,6 +3,16 @@
 /* ----------------- Globals --------------- */
 import { useCallback, useEffect, useState } from 'react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /* ----------------- Types --------------- */
 type TeamMember = {
@@ -39,6 +50,7 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
 
   const loadMembers = useCallback(async () => {
     setError(null);
@@ -96,8 +108,9 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
         message?: string;
       } | null;
 
-      if (response.status === 202) {
-        setInfo(payload?.message ?? 'User not found. Ask them to sign up first.');
+      if (response.ok && payload?.status === 'invite_sent') {
+        setInfo(payload?.message ?? 'Invite sent. They will receive an email to join.');
+        setEmail('');
         return;
       }
 
@@ -137,11 +150,9 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
   };
 
   const handleRemoveMember = async (membershipId: string) => {
-    const confirmed = window.confirm('Remove this member from the organization?');
-    if (!confirmed) return;
-
     setError(null);
     setInfo(null);
+    setMemberToRemove(null);
 
     const response = await fetch(`/api/organizations/${organizationId}/members/${membershipId}`, {
       method: 'DELETE',
@@ -198,7 +209,7 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
         </div>
 
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Adding…' : 'Add member'}
+          {isSubmitting ? 'Adding...' : 'Add member'}
         </Button>
       </form>
 
@@ -208,13 +219,28 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
         </p>
       )}
       {info && (
-        <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-200">
+        <p className="rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm text-primary">
           {info}
         </p>
       )}
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading team members…</p>
+        <div className="space-y-3">
+          <div className="overflow-hidden rounded-lg border">
+            <div className="border-b px-3 py-2">
+              <Skeleton className="h-4 w-full max-w-md" />
+            </div>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 border-b px-3 py-3 last:border-b-0">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-8 w-28" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="ml-auto h-8 w-20" />
+              </div>
+            ))}
+          </div>
+        </div>
       ) : members.length === 0 ? (
         <p className="text-sm text-muted-foreground">No members found for this organization.</p>
       ) : (
@@ -235,19 +261,20 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
                   <td className="px-3 py-2">{member.users?.full_name ?? '—'}</td>
                   <td className="px-3 py-2 text-muted-foreground">{member.users?.email ?? '—'}</td>
                   <td className="px-3 py-2">
-                    <select
-                      className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                    <Select
                       value={member.role}
-                      onChange={(event) =>
-                        void handleRoleChange(
-                          member.id,
-                          event.target.value as 'ADMIN' | 'COLLECTOR'
-                        )
+                      onValueChange={(value) =>
+                        void handleRoleChange(member.id, value as 'ADMIN' | 'COLLECTOR')
                       }
                     >
-                      <option value="ADMIN">ADMIN</option>
-                      <option value="COLLECTOR">COLLECTOR</option>
-                    </select>
+                      <SelectTrigger size="sm" className="w-32 bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                        <SelectItem value="COLLECTOR">Collector</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </td>
                   <td className="px-3 py-2 text-muted-foreground">
                     {new Date(member.created_at).toLocaleDateString('en-IN')}
@@ -257,7 +284,7 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => void handleRemoveMember(member.id)}
+                      onClick={() => setMemberToRemove(member)}
                     >
                       Remove
                     </Button>
@@ -268,6 +295,37 @@ export const TeamSettingsClient = ({ organizationId }: TeamSettingsClientProps) 
           </table>
         </div>
       )}
+
+      <AlertDialog
+        open={memberToRemove !== null}
+        onOpenChange={(open) => {
+          if (!open) setMemberToRemove(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove{' '}
+              <span className="font-medium text-foreground">
+                {memberToRemove?.users?.full_name ?? memberToRemove?.users?.email ?? 'this member'}
+              </span>{' '}
+              from the organization? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (memberToRemove) void handleRemoveMember(memberToRemove.id);
+              }}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

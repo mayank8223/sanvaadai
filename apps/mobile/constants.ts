@@ -41,6 +41,10 @@ export const FORM_FILL_COPY = {
   selectPlaceholder: 'Choose an option',
   filePlaceholder: 'Enter uploaded file path',
   locationPlaceholder: 'lat,long,accuracy',
+  fillViaVoiceLabel: 'Fill via voice',
+  recordingLabel: 'Recording... Tap to stop',
+  processingLabel: 'Processing...',
+  voiceFillErrorTitle: 'Voice fill',
 } as const;
 
 export const OFFLINE_COPY = {

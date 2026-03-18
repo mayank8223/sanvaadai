@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { withApiGuard } from '@/lib/auth/guards';
 import { parseCreateMemberInput } from '@/lib/organizations/contracts';
+import { createOrganizationInvite } from '@/lib/organizations/invites';
 import {
   getUserByEmail,
   getUserById,
@@ -131,14 +132,43 @@ export const POST = withApiGuard(
     }
 
     if (!targetUser) {
+      const supabase = await createClient();
+      const { data: existingInvite } = await supabase
+        .from('organization_invites')
+        .select('id')
+        .eq('email', parsedInput.email!.toLowerCase())
+        .eq('organization_id', organizationId)
+        .is('accepted_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .maybeSingle();
+
+      if (existingInvite) {
+        return NextResponse.json(
+          {
+            status: 'invite_sent',
+            message: 'An invite was already sent to this email. They can check their inbox.',
+          },
+          { status: 200 }
+        );
+      }
+
+      const inviteResult = await createOrganizationInvite({
+        email: parsedInput.email!,
+        organizationId,
+        role: parsedInput.role,
+        invitedByUserId: context.user.id,
+      });
+
+      if (!inviteResult.ok) {
+        return NextResponse.json({ error: inviteResult.error }, { status: 500 });
+      }
+
       return NextResponse.json(
         {
-          status: 'pending_invite',
-          code: 'user_not_found',
-          message:
-            'No user account found for the provided email. Ask this user to sign up first, then retry adding them.',
+          status: 'invite_sent',
+          message: `Invite sent to ${parsedInput.email}. They'll receive an email to create an account and join as ${parsedInput.role}.`,
         },
-        { status: 202 }
+        { status: 201 }
       );
     }
 

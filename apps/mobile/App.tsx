@@ -9,6 +9,7 @@ import useAuthSession from './hooks/useAuthSession';
 import useDynamicFormDraft from './hooks/useDynamicFormDraft';
 import useGpsLocation from './hooks/useGpsLocation';
 import useSubmissionQueueSync from './hooks/useSubmissionQueueSync';
+import useVoiceFormFill from './hooks/useVoiceFormFill';
 
 import './global.css';
 
@@ -43,9 +44,23 @@ const App = () => {
     retryLastSubmit,
   } = useCollectorFormFlow(session, captureGpsNow);
   const { queuedCount, isSyncing, flushQueue, refreshQueueCount } = useSubmissionQueueSync(session);
-  const { draftAnswers, fieldErrors, setDraftValue, validate, reset } = useDynamicFormDraft(
-    activeFormDefinition?.fields ?? []
-  );
+  const { draftAnswers, fieldErrors, setDraftValue, applyDraftAnswers, validate, reset } =
+    useDynamicFormDraft(activeFormDefinition?.fields ?? []);
+
+  const voiceFormFill = useVoiceFormFill({
+    session,
+    organizationId: activeFormDefinition?.organization_id ?? null,
+    fields: activeFormDefinition?.fields ?? [],
+    onApplyAnswers: applyDraftAnswers,
+  });
+
+  const handleVoiceFillPress = async () => {
+    if (voiceFormFill.isRecording) {
+      await voiceFormFill.stopRecordingAndFill();
+    } else {
+      await voiceFormFill.startRecording();
+    }
+  };
 
   const handleOpenForm = async (form: (typeof forms)[number]) => {
     await openForm(form);
@@ -113,11 +128,22 @@ const App = () => {
                   submitErrorMessage: submissionErrorMessage,
                   submitSuccessMessage: submissionSuccessMessage,
                   canRetry: pendingRetryPayload !== null,
+                  voiceFill: {
+                    isRecording: voiceFormFill.isRecording,
+                    isProcessing: voiceFormFill.isProcessing,
+                    error: voiceFormFill.error,
+                    followUpQuestions: voiceFormFill.followUpQuestions,
+                    onVoiceFillPress: handleVoiceFillPress,
+                    onClearVoiceError: voiceFormFill.clearError,
+                    onClearFollowUpQuestions: voiceFormFill.clearFollowUpQuestions,
+                  },
                   onChangeField: setDraftValue,
                   onSubmit: handleSubmitForm,
                   onRetrySubmit: handleRetrySubmit,
                   onBack: handleBackToForms,
-                  onRequestGpsPermission: requestGpsPermission,
+                  onRequestGpsPermission: async () => {
+                    await requestGpsPermission();
+                  },
                 }
               : null
           }

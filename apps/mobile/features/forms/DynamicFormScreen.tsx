@@ -8,6 +8,16 @@ import type { GpsPermissionStatus } from '../../lib/location/gps';
 import type { DraftAnswers, DraftFieldErrors } from '../../lib/forms/dynamic';
 
 /* ----------------- Types --------------- */
+type VoiceFillProps = {
+  isRecording: boolean;
+  isProcessing: boolean;
+  error: string | null;
+  followUpQuestions: Array<{ fieldKey: string; question: string }>;
+  onVoiceFillPress: () => void;
+  onClearVoiceError: () => void;
+  onClearFollowUpQuestions: () => void;
+};
+
 type DynamicFormScreenProps = {
   title: string;
   description: string | null;
@@ -21,6 +31,7 @@ type DynamicFormScreenProps = {
   submitErrorMessage: string | null;
   submitSuccessMessage: string | null;
   canRetry: boolean;
+  voiceFill?: VoiceFillProps | null;
   onBack: () => void;
   onChangeField: (fieldKey: string, value: string) => void;
   onSubmit: () => Promise<void>;
@@ -159,6 +170,7 @@ const DynamicFormScreen = ({
   submitErrorMessage,
   submitSuccessMessage,
   canRetry,
+  voiceFill,
   onBack,
   onChangeField,
   onSubmit,
@@ -175,6 +187,57 @@ const DynamicFormScreen = ({
       <Text className="text-base font-medium text-foreground">{title}</Text>
       {description ? <Text className="mt-1 text-sm text-muted-foreground">{description}</Text> : null}
     </View>
+
+    {voiceFill && (
+      <View className="gap-2">
+        <AppButton
+          label={
+            voiceFill.isRecording
+              ? FORM_FILL_COPY.recordingLabel
+              : voiceFill.isProcessing
+                ? FORM_FILL_COPY.processingLabel
+                : FORM_FILL_COPY.fillViaVoiceLabel
+          }
+          variant="outline"
+          size="sm"
+          disabled={voiceFill.isProcessing || isSubmitting || isCapturingGps}
+          onPress={() => {
+            if (voiceFill.isRecording || !voiceFill.isProcessing) {
+              void voiceFill.onVoiceFillPress();
+            }
+          }}
+        />
+        {voiceFill.error ? (
+          <View className="rounded-md border border-red-200 bg-red-50 px-3 py-2">
+            <Text className="text-xs text-red-600">{voiceFill.error}</Text>
+            <AppButton
+              label="Dismiss"
+              variant="ghost"
+              size="sm"
+              className="mt-1 self-start"
+              onPress={voiceFill.onClearVoiceError}
+            />
+          </View>
+        ) : null}
+        {voiceFill.followUpQuestions.length > 0 ? (
+          <View className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+            <Text className="text-xs font-medium text-amber-800">Follow-up:</Text>
+            {voiceFill.followUpQuestions.map((q) => (
+              <Text key={q.fieldKey} className="mt-1 text-xs text-amber-700">
+                {q.question}
+              </Text>
+            ))}
+            <AppButton
+              label="Clear"
+              variant="ghost"
+              size="sm"
+              className="mt-1 self-start"
+              onPress={voiceFill.onClearFollowUpQuestions}
+            />
+          </View>
+        ) : null}
+      </View>
+    )}
 
     <ScrollView className="max-h-96" contentContainerClassName="gap-3">
       {fields.map((field) => (

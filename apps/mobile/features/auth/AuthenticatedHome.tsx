@@ -34,6 +34,15 @@ export type AuthenticatedHomeProps = {
     submitErrorMessage: string | null;
     submitSuccessMessage: string | null;
     canRetry: boolean;
+    voiceFill?: {
+      isRecording: boolean;
+      isProcessing: boolean;
+      error: string | null;
+      followUpQuestions: Array<{ fieldKey: string; question: string }>;
+      onVoiceFillPress: () => void;
+      onClearVoiceError: () => void;
+      onClearFollowUpQuestions: () => void;
+    } | null;
     onChangeField: (fieldKey: string, value: string) => void;
     onSubmit: () => Promise<void>;
     onRetrySubmit: () => Promise<void>;
@@ -102,6 +111,7 @@ const AuthenticatedHome = ({
             submitErrorMessage={activeForm.submitErrorMessage}
             submitSuccessMessage={activeForm.submitSuccessMessage}
             canRetry={activeForm.canRetry}
+            voiceFill={activeForm.voiceFill}
             onBack={activeForm.onBack}
             onChangeField={activeForm.onChangeField}
             onSubmit={activeForm.onSubmit}

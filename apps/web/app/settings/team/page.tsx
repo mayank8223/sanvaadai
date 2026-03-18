@@ -1,4 +1,5 @@
 /* ----------------- Globals --------------- */
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -13,7 +14,14 @@ import {
 import { getCurrentUser } from '@/lib/auth/server';
 import { loadShellContext } from '@/lib/auth/shell';
 
+import { APP_NAME } from '@/lib/constants';
+
 import { TeamSettingsClient } from './team-settings-client';
+
+/* ----------------- Metadata --------------- */
+export const metadata: Metadata = {
+  title: `Team Settings | ${APP_NAME}`,
+};
 
 /* ----------------- Constants --------------- */
 const TEAM_SETTINGS_PATH = '/settings/team';
