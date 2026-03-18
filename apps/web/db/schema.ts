@@ -47,6 +47,30 @@ export const users = pgTable('users', {
   updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const organizationInvites = pgTable(
+  'organization_invites',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: text('email').notNull(),
+    organization_id: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
+    role: membershipRoleEnum('role').notNull(),
+    token: text('token').notNull().unique(),
+    invited_by_user_id: uuid('invited_by_user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    expires_at: timestamp('expires_at', { withTimezone: true }).notNull(),
+    accepted_at: timestamp('accepted_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_organization_invites_email_org').on(table.email, table.organization_id),
+    index('idx_organization_invites_token').on(table.token),
+    index('idx_organization_invites_expires_at').on(table.expires_at),
+  ]
+);
+
 export const memberships = pgTable(
   'memberships',
   {

@@ -8,13 +8,17 @@
     "scheme": "sanvaadai",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sanvaadai.collector"
+      "bundleIdentifier": "com.sanvaadai.collector",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app uses the microphone for voice-powered form filling."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sanvaadai.collector"
+      "package": "com.sanvaadai.collector",
+      "permissions": ["android.permission.RECORD_AUDIO"]
     }
   }
 }

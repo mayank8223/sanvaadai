@@ -37,6 +37,17 @@ const useDynamicFormDraft = (fields: FormFieldDefinition[]) => {
     });
   };
 
+  const applyDraftAnswers = (answers: Record<string, string>) => {
+    setDraftAnswers((previousValue) => ({ ...previousValue, ...answers }));
+    setFieldErrors((previousValue) => {
+      const nextValue = { ...previousValue };
+      for (const key of Object.keys(answers)) {
+        delete nextValue[key];
+      }
+      return nextValue;
+    });
+  };
+
   const validate = () => {
     const result = validateAndBuildSubmissionAnswers(fields, draftAnswers);
     setFieldErrors(result.errors);
@@ -47,6 +58,7 @@ const useDynamicFormDraft = (fields: FormFieldDefinition[]) => {
     draftAnswers,
     fieldErrors,
     setDraftValue,
+    applyDraftAnswers,
     validate,
     reset: () => {
       setDraftAnswers(defaultDraftAnswers);
