@@ -64,9 +64,9 @@ const STEPS = [
   },
 ] as const;
 
-export const LandingPage = () => (
+export const LandingPage = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => (
   <div className="flex min-h-screen flex-col bg-background text-foreground">
-    <PublicHeader />
+    <PublicHeader isAuthenticated={isAuthenticated} />
 
     <main className="flex-1">
       {/* Hero */}
@@ -81,12 +81,20 @@ export const LandingPage = () => (
           offline, and analyze results - all in one platform.
         </p>
         <div className="mt-10 flex items-center justify-center gap-4">
-          <Button size="lg" asChild>
-            <Link href="/signup">Get Started</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/login">Sign In</Link>
-          </Button>
+          {isAuthenticated ? (
+            <Button size="lg" asChild>
+              <Link href="/home/admin">Go to Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button size="lg" asChild>
+                <Link href="/signup">Get Started</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/login">Sign In</Link>
+              </Button>
+            </>
+          )}
         </div>
       </section>
 
@@ -138,7 +146,9 @@ export const LandingPage = () => (
           </h2>
           <div className="mt-8">
             <Button size="lg" asChild>
-              <Link href="/signup">Get Started Free</Link>
+              <Link href={isAuthenticated ? '/home/admin' : '/signup'}>
+                {isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}
+              </Link>
             </Button>
           </div>
         </div>
